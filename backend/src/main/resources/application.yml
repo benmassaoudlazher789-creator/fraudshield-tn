@@ -1,0 +1,25 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: fraudshield-backend
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/fraudshield
+    username: fraudshield
+    password: fraudshield
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: fraudshield-backend
+      auto-offset-reset: earliest
