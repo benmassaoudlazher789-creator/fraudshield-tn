@@ -1,0 +1,7 @@
+ml/data/
+ml/.venv/
+.ipynb_checkpoints/
+backend/target/
+frontend/node_modules/
+frontend/dist/
+.idea/

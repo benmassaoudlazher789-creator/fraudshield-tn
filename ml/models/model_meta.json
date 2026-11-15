@@ -1,0 +1,14 @@
+{
+  "features": [
+    "is_transfer",
+    "amount",
+    "old_balance_orig",
+    "new_balance_orig",
+    "old_balance_dest",
+    "new_balance_dest",
+    "error_balance_orig",
+    "error_balance_dest",
+    "hour"
+  ],
+  "threshold": 0.9840884208679199
+}
