@@ -42,5 +42,24 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  spark-job:
+    build: ./spark-job
+    container_name: spark-job
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BOOTSTRAP: kafka:29092
+      MODEL_DIR: /models
+    volumes:
+      - ./ml/models:/models:ro
+    command: >
+      /opt/spark/bin/spark-submit
+      --master local[2]
+      --driver-memory 1g
+      --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.9
+      --conf spark.jars.ivy=/opt/ivy
+      /app/fraud_stream.py
+    restart: unless-stopped
+
 volumes:
   postgres_data:
