@@ -1,0 +1,217 @@
+@if (loadError(); as message) {
+  <div class="banner banner--error" role="alert">
+    <span class="banner__icon"><i class="pi pi-exclamation-circle"></i></span>
+    <div class="banner__body">
+      <strong>Erreur de chargement</strong>
+      <p>{{ message }}</p>
+    </div>
+  </div>
+}
+
+<!-- En-tête : titulaire et solde -->
+<section class="card account">
+  <div class="account__owner">
+    <div class="account__icon"><i class="pi pi-building-columns" aria-hidden="true"></i></div>
+    <div>
+      <div class="account__name-row">
+        <h1>{{ user()?.fullName }}</h1>
+        <span class="active-pill">Actif</span>
+      </div>
+      <p class="account__meta">
+        @if (account(); as acc) {
+          {{ acc.bank }} • <span class="tabular">{{ maskedRef() }}</span>
+        } @else if (loading()) {
+          Chargement du compte…
+        }
+      </p>
+    </div>
+  </div>
+
+  <div class="balance">
+    <span class="balance__label"><i class="pi pi-verified" aria-hidden="true"></i>Solde disponible</span>
+    <div class="balance__value tabular" aria-live="polite">
+      <span class="balance__amount">{{ account()?.balance | dt: false }}</span>
+      <span class="balance__currency">DT</span>
+    </div>
+    <span class="balance__hint">Compte courant</span>
+  </div>
+</section>
+
+<div class="grid">
+  <!-- Colonne gauche : formulaire + résultat -->
+  <div class="col-main">
+    <section class="card">
+      <header class="card__header">
+        <div>
+          <h2>Effectuer un paiement</h2>
+          <p>Saisissez les informations relatives à votre nouvelle opération</p>
+        </div>
+        <span class="card__icon"><i class="pi pi-send" aria-hidden="true"></i></span>
+      </header>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="field">
+          <label for="beneficiary">Bénéficiaire</label>
+          <span class="with-icon">
+            <i class="pi pi-user" aria-hidden="true"></i>
+            <input
+              pInputText
+              variant="filled"
+              id="beneficiary"
+              formControlName="beneficiary"
+              placeholder="Nom ou identifiant RIB/IBAN du destinataire"
+              autocomplete="off"
+              maxlength="100"
+              [attr.aria-invalid]="!!fieldError('beneficiary')"
+              aria-describedby="beneficiary-error"
+            />
+          </span>
+          @if (fieldError('beneficiary'); as msg) {
+            <small id="beneficiary-error" class="field__error">{{ msg }}</small>
+          }
+        </div>
+
+        <div class="field">
+          <div class="field__row">
+            <label for="amount">Montant (DT)</label>
+            @if (account(); as acc) {
+              <span class="field__aside tabular">Solde : {{ acc.balance | dt }}</span>
+            }
+          </div>
+          <p-inputnumber
+            inputId="amount"
+            formControlName="amount"
+            variant="filled"
+            mode="decimal"
+            locale="fr-FR"
+            [minFractionDigits]="3"
+            [maxFractionDigits]="3"
+            [min]="0"
+            suffix=" DT"
+            placeholder="0,000 DT"
+            [fluid]="true"
+            [invalid]="!!fieldError('amount')"
+            ariaLabel="Montant en dinars"
+          />
+          <div class="chips">
+            <span class="chips__label">Montants rapides :</span>
+            @for (value of quickAmounts; track value) {
+              <button type="button" class="chip tabular" (click)="setAmount(value)">{{ value }} DT</button>
+            }
+          </div>
+          @if (fieldError('amount'); as msg) {
+            <small class="field__error" role="alert">{{ msg }}</small>
+          }
+        </div>
+
+        <div class="field-pair">
+          <div class="field">
+            <label for="type">Type</label>
+            <p-select
+              inputId="type"
+              formControlName="type"
+              variant="filled"
+              [options]="typeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [fluid]="true"
+            />
+          </div>
+          <div class="field">
+            <label for="country">Pays de destination</label>
+            <p-select
+              inputId="country"
+              formControlName="country"
+              variant="filled"
+              [options]="countryOptions"
+              optionLabel="label"
+              optionValue="value"
+              [fluid]="true"
+            >
+              <ng-template #selectedItem let-option>
+                <span class="country-option"><app-flag [code]="option.value" />{{ option.label }}</span>
+              </ng-template>
+              <ng-template #item let-option>
+                <span class="country-option"><app-flag [code]="option.value" />{{ option.label }}</span>
+              </ng-template>
+            </p-select>
+          </div>
+        </div>
+
+        <p-button
+          type="submit"
+          styleClass="pay-button"
+          [label]="submitting() ? 'Envoi en cours…' : 'Payer'"
+          icon="pi pi-arrow-right"
+          iconPos="right"
+          [loading]="submitting()"
+          [disabled]="analysing() || !account()"
+          [fluid]="true"
+        />
+      </form>
+    </section>
+
+    <!-- Résultat du paiement (jamais de score ni de motif) -->
+    <div aria-live="polite">
+      @if (banner(); as b) {
+        <div class="banner" [class]="'banner--' + b.kind" [attr.role]="b.kind === 'error' ? 'alert' : 'status'">
+          <span class="banner__icon">
+            @switch (b.kind) {
+              @case ('pending') { <i class="pi pi-spin pi-spinner"></i> }
+              @case ('success') { <i class="pi pi-check-circle"></i> }
+              @case ('blocked') { <i class="pi pi-shield"></i> }
+              @case ('timeout') { <i class="pi pi-clock"></i> }
+              @default { <i class="pi pi-exclamation-circle"></i> }
+            }
+          </span>
+          <div class="banner__body">
+            <strong>{{ b.title }}</strong>
+            @if (b.text) {
+              <p>{{ b.text }}</p>
+            }
+          </div>
+          @if (b.kind !== 'pending') {
+            <button type="button" class="banner__close" (click)="closeBanner()" aria-label="Fermer le message">
+              <i class="pi pi-times"></i>
+            </button>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Colonne droite : dernières transactions -->
+  <section class="card col-side">
+    <header class="card__header">
+      <div>
+        <h2>Mes dernières transactions</h2>
+        <p>Suivi des flux récents et statuts</p>
+      </div>
+      <a routerLink="/client/transactions" class="see-all">
+        Voir tout l'historique <i class="pi pi-chevron-right" aria-hidden="true"></i>
+      </a>
+    </header>
+
+    @if (loading()) {
+      <p class="empty">Chargement…</p>
+    } @else {
+      <ul class="tx-list">
+        @for (tx of recent(); track tx.id) {
+          <li class="tx">
+            <app-flag class="tx__flag" [code]="tx.country" />
+            <div class="tx__main">
+              <span class="tx__beneficiary">{{ tx.beneficiary }}</span>
+              <span class="tx__meta">{{ tx.createdAt | shortDate }} • {{ countryName(tx.country) }}</span>
+            </div>
+            <div class="tx__right">
+              <span class="tx__amount tabular">{{ tx.amount | dt }}</span>
+              <app-status-badge [status]="tx.status" />
+            </div>
+          </li>
+        } @empty {
+          <li class="empty">Aucune transaction pour le moment.</li>
+        }
+      </ul>
+    }
+  </section>
+</div>

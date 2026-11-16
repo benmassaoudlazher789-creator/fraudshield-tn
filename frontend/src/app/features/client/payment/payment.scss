@@ -1,0 +1,471 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--fs-surface);
+  border-radius: var(--fs-radius-lg);
+  box-shadow: var(--fs-shadow-card);
+  padding: 1.5rem;
+  min-width: 0;
+
+  &__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+
+    h2 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      margin: 0.125rem 0 0;
+      font-size: 12px;
+      color: var(--fs-text-muted);
+    }
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--fs-radius);
+    background: var(--fs-surface-high);
+    color: var(--fs-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+/* ---------- En-tête compte ---------- */
+.account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  &__owner {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  &__icon {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--fs-radius-lg);
+    background: var(--fs-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+  }
+
+  &__name-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 36px;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  &__meta {
+    margin: 0;
+    color: var(--fs-text-muted);
+  }
+}
+
+.active-pill {
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  background: #004a31;
+  color: #4edea3;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.balance {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--fs-radius);
+  background: var(--fs-surface-low);
+
+  &__label {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--fs-text-muted);
+
+    .pi {
+      color: var(--fs-success);
+    }
+  }
+
+  &__value {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  &__amount {
+    font-size: 32px;
+    line-height: 38px;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--fs-primary-dark);
+  }
+
+  &__currency {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--fs-text-muted);
+  }
+
+  &__hint {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--fs-text-subtle);
+  }
+}
+
+/* ---------- Grille 7 / 5 ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.col-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+/* ---------- Formulaire ---------- */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  min-width: 0;
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__aside {
+    font-size: 12px;
+    color: var(--fs-text-muted);
+  }
+
+  &__error {
+    font-size: 12px;
+    color: var(--fs-danger-text);
+  }
+}
+
+.field-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Champ texte avec icône à gauche */
+.with-icon {
+  position: relative;
+  display: block;
+
+  .pi {
+    position: absolute;
+    top: 50%;
+    left: 0.75rem;
+    transform: translateY(-50%);
+    color: var(--fs-text-subtle);
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    padding-left: 2.25rem;
+  }
+}
+
+/* Option du sélecteur de pays : drapeau + nom */
+.country-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding-top: 0.25rem;
+
+  &__label {
+    margin-right: 0.25rem;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--fs-text-muted);
+  }
+}
+
+.chip {
+  padding: 0.25rem 0.75rem;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--fs-surface-high);
+  color: var(--fs-text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: #dae2fd;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+  }
+}
+
+:host ::ng-deep .pay-button {
+  margin-top: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--fs-primary-dark);
+  border-color: var(--fs-primary-dark);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ---------- Bannières de résultat ---------- */
+.banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: var(--fs-radius-lg);
+  box-shadow: var(--fs-shadow-card);
+
+  &__icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+  }
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+
+    strong {
+      font-size: 16px;
+      line-height: 24px;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 0.25rem 0 0;
+    }
+  }
+
+  &__close {
+    padding: 0.25rem;
+    border: 0;
+    border-radius: 0.375rem;
+    background: none;
+    color: inherit;
+    opacity: 0.7;
+    cursor: pointer;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &--pending,
+  &--timeout {
+    background: #eef2fb;
+    color: var(--fs-primary-dark);
+    .banner__icon { background: #dce4f6; }
+  }
+
+  &--success {
+    background: rgba(0, 74, 49, 0.1);
+    color: #004a31;
+    .banner__icon { background: rgba(78, 222, 163, 0.3); }
+  }
+
+  &--blocked,
+  &--error {
+    background: rgba(255, 218, 214, 0.4);
+    color: #ba1a1a;
+    .banner__icon { background: #ffdad6; }
+    p { color: #93000a; }
+  }
+}
+
+/* ---------- Dernières transactions ---------- */
+.see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-shrink: 0;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--fs-primary-dark);
+  text-decoration: none;
+
+  .pi {
+    font-size: 0.75rem;
+  }
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tx-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tx {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 0;
+  border-bottom: 1px solid var(--fs-surface-low);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &__flag {
+    flex-shrink: 0;
+    font-size: 18px;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__beneficiary {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: var(--fs-text-muted);
+  }
+
+  &__right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  &__amount {
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+}
+
+.empty {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--fs-text-muted);
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1279px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 639px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .account__name-row h1 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .balance {
+    width: 100%;
+    align-items: flex-start;
+  }
+
+  .field-pair {
+    grid-template-columns: 1fr;
+  }
+}

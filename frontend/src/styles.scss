@@ -114,4 +114,11 @@ body {
     color: var(--fs-danger-text);
     &::before { background: var(--fs-danger); }
   }
+
+  /* En cours d'analyse : bleu neutre */
+  &--info {
+    background: #dae2fd;
+    color: #3f465c;
+    &::before { background: #5c647a; }
+  }
 }

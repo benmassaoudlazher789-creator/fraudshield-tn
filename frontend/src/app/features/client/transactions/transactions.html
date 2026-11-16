@@ -1,0 +1,65 @@
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Espace client</span>
+    <h1>Mes transactions</h1>
+    <p>Historique de vos opérations récentes et de leur statut.</p>
+  </div>
+  <p-button
+    label="Actualiser"
+    icon="pi pi-refresh"
+    severity="secondary"
+    [outlined]="true"
+    [loading]="loading()"
+    (onClick)="load()"
+  />
+</header>
+
+@if (error(); as message) {
+  <div class="error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ message }}</span>
+  </div>
+}
+
+<section class="card">
+  <p-table
+    [value]="transactions()"
+    [loading]="loading()"
+    dataKey="id"
+    sortField="createdAt"
+    [sortOrder]="-1"
+    styleClass="tx-table"
+  >
+    <ng-template #header>
+      <tr>
+        <th pSortableColumn="createdAt">Date <p-sortIcon field="createdAt" /></th>
+        <th pSortableColumn="beneficiary">Bénéficiaire <p-sortIcon field="beneficiary" /></th>
+        <th>Type</th>
+        <th>Pays</th>
+        <th pSortableColumn="amount" class="num">Montant <p-sortIcon field="amount" /></th>
+        <th>Statut</th>
+      </tr>
+    </ng-template>
+
+    <ng-template #body let-tx>
+      <tr>
+        <td class="tabular nowrap">{{ tx.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+        <td class="beneficiary">{{ tx.beneficiary }}</td>
+        <td>{{ typeLabel(tx.type) }}</td>
+        <td class="nowrap">
+          <span class="country"><app-flag [code]="tx.country" />{{ countryName(tx.country) }}</span>
+        </td>
+        <td class="num tabular nowrap">{{ tx.amount | dt }}</td>
+        <td><app-status-badge [status]="tx.status" /></td>
+      </tr>
+    </ng-template>
+
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="6" class="empty">Aucune transaction pour le moment.</td>
+      </tr>
+    </ng-template>
+  </p-table>
+</section>
+
+<p class="footnote">Seules vos 10 dernières opérations sont affichées.</p>
