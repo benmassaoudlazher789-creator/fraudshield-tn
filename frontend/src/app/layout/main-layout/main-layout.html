@@ -1,0 +1,75 @@
+<div class="shell" [class.shell--menu-open]="menuOpen()">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar__brand">
+      <div class="sidebar__logo"><i class="pi pi-shield"></i></div>
+      <div class="sidebar__brand-text">
+        <span class="sidebar__name">FraudShield TN</span>
+        <span class="sidebar__tagline">Plateforme de détection</span>
+      </div>
+    </div>
+
+    <nav class="sidebar__nav" aria-label="Navigation principale">
+      @for (item of menu(); track item.link) {
+        <a
+          class="nav-link"
+          [routerLink]="item.link"
+          routerLinkActive="nav-link--active"
+          ariaCurrentWhenActive="page"
+        >
+          <i [class]="item.icon" aria-hidden="true"></i>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="sidebar__footer">
+      <span class="status-dot"></span>
+      <span>Système actif</span>
+    </div>
+  </aside>
+
+  <!-- Voile cliquable derrière le menu mobile -->
+  <div class="backdrop" (click)="menuOpen.set(false)" aria-hidden="true"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button
+        type="button"
+        class="topbar__burger"
+        (click)="toggleMenu()"
+        aria-controls="sidebar"
+        [attr.aria-expanded]="menuOpen()"
+        aria-label="Ouvrir le menu"
+      >
+        <i class="pi pi-bars"></i>
+      </button>
+
+      <div class="topbar__spacer"></div>
+
+      @if (user(); as u) {
+        <div class="user">
+          <div class="user__avatar" aria-hidden="true">{{ initials() }}</div>
+          <div class="user__text">
+            <span class="user__name">{{ u.fullName }}</span>
+            <span class="user__role">{{ roleLabel() }}</span>
+          </div>
+        </div>
+      }
+
+      <div class="topbar__divider"></div>
+
+      <p-button
+        label="Déconnexion"
+        icon="pi pi-sign-out"
+        severity="secondary"
+        [outlined]="true"
+        size="small"
+        (onClick)="logout()"
+      />
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>

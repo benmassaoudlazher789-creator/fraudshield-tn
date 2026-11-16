@@ -1,0 +1,136 @@
+<div class="login">
+  <!-- Moitié gauche : présentation -->
+  <aside class="login__hero">
+    <div class="brand">
+      <div class="brand__logo"><i class="pi pi-shield"></i></div>
+      <div>
+        <div class="brand__name">FraudShield TN</div>
+        <div class="brand__tagline">Surveillance bancaire</div>
+      </div>
+    </div>
+
+    <div class="hero__content">
+      <h1>Détection des fraudes financières en temps réel</h1>
+      <p class="hero__lead">
+        Supervision proactive, scoring automatisé des flux de transactions et accompagnement des
+        analystes au quotidien.
+      </p>
+
+      <div class="live">
+        <div class="live__head">
+          <span>Flux de transactions en direct</span>
+          <span class="live__badge"><span class="live__dot"></span>En direct</span>
+        </div>
+        <svg viewBox="0 0 360 64" fill="none" aria-hidden="true">
+          <path
+            d="M0 48 C 40 46, 60 20, 90 28 C 120 36, 140 12, 170 24 C 200 36, 220 16, 260 20 C 300 24, 320 8, 360 14"
+            stroke="#6ffbbe"
+            stroke-width="2.5"
+            stroke-linecap="round"
+          />
+          <circle cx="170" cy="24" r="4" fill="#6ffbbe" class="pulse" />
+          <circle cx="360" cy="14" r="4" fill="#6ffbbe" />
+        </svg>
+      </div>
+
+      <ul class="highlights">
+        @for (item of highlights; track item.title) {
+          <li>
+            <span class="highlights__icon"><i [class]="item.icon"></i></span>
+            <div>
+              <h3>{{ item.title }}</h3>
+              <p>{{ item.text }}</p>
+            </div>
+          </li>
+        }
+      </ul>
+    </div>
+
+    <footer class="hero__footer">© {{ year }} FraudShield TN — Projet académique</footer>
+  </aside>
+
+  <!-- Moitié droite : formulaire -->
+  <main class="login__panel">
+    <div class="panel__inner">
+      <div class="card">
+        <div class="card__accent"></div>
+        <header class="card__header">
+          <h2>Connexion</h2>
+          <i class="pi pi-user card__icon" aria-hidden="true"></i>
+        </header>
+        <p class="card__subtitle">Connectez-vous à votre espace FraudShield TN</p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          @if (error(); as message) {
+            <p-message severity="error" icon="pi pi-times-circle" styleClass="form-error">
+              {{ message }}
+            </p-message>
+          }
+
+          <div class="field">
+            <label for="email">Adresse e-mail</label>
+            <div class="input-box" [class.input-box--invalid]="fieldError('email')">
+              <i class="pi pi-envelope" aria-hidden="true"></i>
+              <input
+                pInputText
+                id="email"
+                type="email"
+                formControlName="email"
+                autocomplete="email"
+                placeholder="nom@fraudshield.tn"
+                [attr.aria-invalid]="!!fieldError('email')"
+                aria-describedby="email-error"
+              />
+            </div>
+            @if (fieldError('email'); as msg) {
+              <small id="email-error" class="field__error">{{ msg }}</small>
+            }
+          </div>
+
+          <div class="field">
+            <label for="password">Mot de passe</label>
+            <div class="input-box" [class.input-box--invalid]="fieldError('password')">
+              <i class="pi pi-lock" aria-hidden="true"></i>
+              <input
+                pInputText
+                id="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="password"
+                autocomplete="current-password"
+                placeholder="••••••••••••"
+                [attr.aria-invalid]="!!fieldError('password')"
+                aria-describedby="password-error"
+              />
+              <button
+                type="button"
+                class="input-box__toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+              >
+                <i [class]="showPassword() ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
+              </button>
+            </div>
+            @if (fieldError('password'); as msg) {
+              <small id="password-error" class="field__error">{{ msg }}</small>
+            }
+          </div>
+
+          <p-button
+            type="submit"
+            styleClass="submit"
+            [label]="loading() ? 'Connexion en cours…' : 'Se connecter'"
+            icon="pi pi-arrow-right"
+            iconPos="right"
+            [loading]="loading()"
+            [fluid]="true"
+          />
+        </form>
+      </div>
+
+      <p class="help">
+        <i class="pi pi-question-circle" aria-hidden="true"></i>
+        <span>Mot de passe oublié ? Contactez votre administrateur.</span>
+      </p>
+    </div>
+  </main>
+</div>
