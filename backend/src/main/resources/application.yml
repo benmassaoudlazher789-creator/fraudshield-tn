@@ -30,3 +30,7 @@ app:
     expiration-ms: 86400000
   cors:
     allowed-origins: http://localhost:4200
+  kafka:
+    topics:
+      transactions: transactions
+      alerts: alerts
