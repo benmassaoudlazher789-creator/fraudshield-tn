@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()   // pré-requêtes CORS
                         .requestMatchers("/api/auth/login").permitAll()
                         .requestMatchers("/ws/**").permitAll()                    // WebSocket, sécurisé plus tard
+                        .requestMatchers(HttpMethod.GET, "/ws-test.html").permitAll() // page de test STOMP
                         .requestMatchers("/error").permitAll()                    // page d'erreur Spring (400, 500...)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/analyst/**").hasAnyRole("ANALYSTE", "ADMIN")

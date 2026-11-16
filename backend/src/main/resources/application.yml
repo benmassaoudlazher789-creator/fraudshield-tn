@@ -23,6 +23,8 @@ spring:
     consumer:
       group-id: fraudshield-backend
       auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
 
 app:
   jwt:
@@ -34,3 +36,7 @@ app:
     topics:
       transactions: transactions
       alerts: alerts
+  fraud:
+    # Score final à partir duquel une transaction passe en A_VERIFIER
+    # (le blocage automatique est la règle AUTO_BLOCK_SCORE en base)
+    review-threshold: 50
