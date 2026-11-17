@@ -1,0 +1,320 @@
+<header class="page-header">
+  <div>
+    <span class="eyebrow">Analytique opérationnelle · <strong>Supervision IA</strong></span>
+    <h1>Statistiques &amp; Analyse des Modèles</h1>
+    <p>Analyse des tendances de fraude et métriques d'évaluation algorithmique</p>
+  </div>
+  <p-selectbutton
+    [options]="periodOptions"
+    optionLabel="label"
+    optionValue="value"
+    [allowEmpty]="false"
+    [ngModel]="days()"
+    (ngModelChange)="onPeriodChange($event)"
+    aria-label="Période"
+  />
+</header>
+
+@if (error(); as message) {
+  <div class="error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ message }}
+  </div>
+}
+
+<!-- Indicateurs de la période -->
+<section class="kpis">
+  <article class="kpi">
+    <div class="kpi__head">
+      <span class="kpi__label">Alertes interceptées</span>
+      <span class="kpi__icon"><i class="pi pi-shield"></i></span>
+    </div>
+    <div class="kpi__value tabular">
+      {{ alertsText() }}
+      @if (alertsDelta(); as delta) {
+        <span class="kpi__delta" [class.kpi__delta--up]="delta.up">
+          <i [class]="delta.up ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" aria-hidden="true"></i>{{ delta.text }}
+        </span>
+      }
+    </div>
+    <span class="kpi__foot">vs période précédente</span>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi__head">
+      <span class="kpi__label">Montant bloqué</span>
+      <span class="kpi__icon"><i class="pi pi-wallet"></i></span>
+    </div>
+    <div class="kpi__value tabular">{{ stats()?.summary?.blockedAmount | dt: false }}<small>DT</small></div>
+    <span class="kpi__foot">Sur {{ days() }} jours consécutifs</span>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi__head">
+      <span class="kpi__label">Faux positifs traités</span>
+      <span class="kpi__icon"><i class="pi pi-verified"></i></span>
+    </div>
+    <div class="kpi__value tabular">
+      {{ decisions().falsePositive }}
+      <small>({{ decisions().falsePositivePct }} %)</small>
+    </div>
+    <span class="kpi__foot">Sur {{ decisions().total }} décision(s) d'analyste</span>
+  </article>
+
+  <article class="kpi">
+    <div class="kpi__head">
+      <span class="kpi__label">Délai moyen / dossier</span>
+      <span class="kpi__icon"><i class="pi pi-stopwatch"></i></span>
+    </div>
+    <div class="kpi__value tabular">
+      @if (avgDecision(); as d) {
+        {{ d.main }}<small>{{ d.mainUnit }}</small> {{ d.rest }}<small>{{ d.restUnit }}</small>
+      } @else {
+        —
+      }
+    </div>
+    <span class="kpi__foot">De l'alerte à la décision de l'analyste</span>
+  </article>
+</section>
+
+<!-- Évolution des fraudes -->
+<section class="card">
+  <header class="card__header">
+    <div>
+      <h2>Évolution des fraudes détectées <span class="chip">{{ days() }} derniers jours</span></h2>
+      <p>Transactions bloquées ou à vérifier, par jour de création</p>
+    </div>
+    <span class="total-pill">
+      <span class="dot dot--primary"></span>Total : <strong class="tabular">{{ formatInt(totalFrauds()) }}</strong> fraude(s) détectée(s)
+    </span>
+  </header>
+  <div class="chart chart--line">
+    <p-chart type="line" [data]="lineData()" [options]="lineOptions" height="100%" />
+  </div>
+  <footer class="chart-legend">
+    <span><span class="dot dot--primary"></span>Fraudes détectées (bloquées + à vérifier)</span>
+    <span><span class="dot dot--danger"></span>Dont bloquées</span>
+  </footer>
+</section>
+
+<div class="grid">
+  <!-- Fraudes par type -->
+  <section class="card">
+    <header class="card__header">
+      <div>
+        <h2>Fraudes par type de transaction</h2>
+        <p>Répartition volumétrique et valeur financière signalée</p>
+      </div>
+      <i class="pi pi-arrow-right-arrow-left card__deco" aria-hidden="true"></i>
+    </header>
+
+    <ul class="bars">
+      @for (row of typeRows(); track row.type) {
+        <li class="bar">
+          <div class="bar__head">
+            <span class="bar__icon"><i [class]="row.icon" aria-hidden="true"></i></span>
+            <span class="bar__label">{{ row.label }}</span>
+            <strong class="tabular">{{ row.pctText }}</strong>
+            <span class="bar__amount tabular">{{ row.amount | dt }}</span>
+          </div>
+          <span class="track" role="img" [attr.aria-label]="row.label + ' : ' + row.pctText">
+            <span class="fill" [style.width.%]="row.pct"></span>
+          </span>
+          <div class="bar__foot">
+            <span>{{ row.count }} transaction(s) ciblée(s)</span>
+            <span>Moyenne : {{ row.average === null ? '—' : (row.average | dt) }}</span>
+          </div>
+        </li>
+      }
+    </ul>
+    <div class="card__total">
+      <span>Total cumulé sous surveillance</span>
+      <strong class="tabular">{{ typeTotalAmount() | dt }}</strong>
+    </div>
+  </section>
+
+  <!-- Top pays -->
+  <section class="card">
+    <header class="card__header">
+      <div>
+        <h2>Top pays de destination des fraudes</h2>
+        <p>Pays de destination des transactions bloquées</p>
+      </div>
+      <i class="pi pi-globe card__deco" aria-hidden="true"></i>
+    </header>
+
+    <ul class="countries">
+      @for (row of countryRows(); track row.country) {
+        <li class="country">
+          <span class="country__code"><app-flag [code]="row.country" /></span>
+          <div class="country__body">
+            <div class="country__head">
+              <span class="country__name">{{ row.name }}</span>
+              <strong class="tabular">{{ row.count }} cas</strong>
+              <span class="country__amount tabular">({{ row.amount | dt }})</span>
+            </div>
+            <span class="track" role="img" [attr.aria-label]="row.name + ' : ' + row.count + ' cas'">
+              <span class="fill" [style.width.%]="row.width" [style.background]="row.color"></span>
+            </span>
+          </div>
+        </li>
+      } @empty {
+        <li class="empty">Aucune transaction bloquée sur la période.</li>
+      }
+    </ul>
+  </section>
+
+  <!-- Performance du modèle -->
+  <section class="card">
+    <header class="card__header">
+      <div>
+        <h2>Performance du modèle</h2>
+        <p>Modèle XGBoost — évalué sur PaySim (jeu de test)</p>
+      </div>
+      @if (metrics(); as m) {
+        <span class="model-badge">{{ m.model }}</span>
+      }
+    </header>
+
+    @if (metrics(); as m) {
+      <div class="metrics">
+        @for (tile of m.tiles; track tile.label) {
+          <div class="metric">
+            <span>{{ tile.label }}</span>
+            <strong class="metric__value tabular">{{ tile.text }}</strong>
+            <span class="metric__track"><span [style.width.%]="tile.width"></span></span>
+          </div>
+        }
+      </div>
+
+      @if (m.matrix; as cm) {
+        <div class="matrix-head">
+          <strong>Matrice de confusion</strong>
+          @if (m.sample) {
+            <span>Échantillon : {{ m.sample }} transactions</span>
+          }
+        </div>
+        <div class="matrix" role="table" aria-label="Matrice de confusion">
+          <span></span>
+          <span class="matrix__col" role="columnheader">Prédit : Fraude</span>
+          <span class="matrix__col" role="columnheader">Prédit : Légitime</span>
+
+          <span class="matrix__row" role="rowheader">Réel<br />Fraude</span>
+          <div class="cell" role="cell">
+            <span>Vrais positifs (VP)</span>
+            <strong class="tabular">{{ cm.tp }}</strong>
+            <small class="cell__good">{{ cm.interception }} taux d'interception</small>
+          </div>
+          <div class="cell" role="cell">
+            <span>Faux négatifs (FN)</span>
+            <strong class="tabular cell__bad">{{ cm.fn }}</strong>
+            <small>Non bloqués</small>
+          </div>
+
+          <span class="matrix__row" role="rowheader">Réel<br />Légitime</span>
+          <div class="cell" role="cell">
+            <span>Faux positifs (FP)</span>
+            <strong class="tabular">{{ cm.fp }}</strong>
+            <small>Fausse alerte modèle</small>
+          </div>
+          <div class="cell" role="cell">
+            <span>Vrais négatifs (VN)</span>
+            <strong class="tabular">{{ cm.tn }}</strong>
+            <small>Flux régulier</small>
+          </div>
+        </div>
+      }
+
+      @if (m.models.length) {
+        <table class="compare">
+          <caption>Comparaison des modèles (seuil 0,5)</caption>
+          <thead>
+            <tr><th>Modèle</th><th>Précision</th><th>Rappel</th><th>F1</th><th>AUC-PR</th></tr>
+          </thead>
+          <tbody>
+            @for (row of m.models; track row.name) {
+              <tr [class.best]="row.best">
+                <td>{{ row.name }}</td>
+                <td class="tabular">{{ row.precision }}</td>
+                <td class="tabular">{{ row.recall }}</td>
+                <td class="tabular">{{ row.f1 }}</td>
+                <td class="tabular">{{ row.aucPr }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+
+      @if (m.threshold) {
+        <p class="chart-legend">Métriques au seuil de décision optimal du modèle ({{ m.threshold }}).</p>
+      }
+    } @else if (stats()) {
+      <div class="no-metrics">
+        <i class="pi pi-info-circle" aria-hidden="true"></i>
+        <div>
+          <strong>Métriques du modèle indisponibles</strong>
+          <p>
+            Le fichier <code>ml/models/model_metrics.json</code> est introuvable. Exécutez le notebook
+            <code>ml/02_entrainement.ipynb</code> jusqu'à sa dernière cellule pour le générer.
+          </p>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- Décisions des analystes -->
+  <section class="card card--decisions">
+    <header class="card__header">
+      <div>
+        <h2>Décisions des analystes</h2>
+        <p>Validation humaine des dossiers soumis par le scoring de risque</p>
+      </div>
+      <i class="pi pi-check-square card__deco" aria-hidden="true"></i>
+    </header>
+
+    <div class="decisions">
+      <div class="donut">
+        <p-chart type="doughnut" [data]="donutData()" [options]="donutOptions" height="100%" />
+        <div class="donut__center">
+          <strong class="tabular">{{ decisions().total ? decisions().confirmedRound + ' %' : '—' }}</strong>
+          <small>Confirmé</small>
+        </div>
+      </div>
+
+      <div class="decision-tiles">
+        <div class="decision-tile">
+          <div class="decision-tile__head">
+            <span class="dot dot--primary"></span>
+            <span>Fraudes confirmées</span>
+            <strong class="tabular">{{ decisions().confirmedPct }} %</strong>
+          </div>
+          <div class="decision-tile__foot">
+            <span>Dossiers bloqués</span>
+            <strong class="tabular">{{ decisions().confirmed }}</strong>
+          </div>
+        </div>
+        <div class="decision-tile">
+          <div class="decision-tile__head">
+            <span class="dot dot--soft"></span>
+            <span>Faux positifs classés</span>
+            <strong class="tabular">{{ decisions().falsePositivePct }} %</strong>
+          </div>
+          <div class="decision-tile__foot">
+            <span>Transactions relâchées</span>
+            <strong class="tabular">{{ decisions().falsePositive }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card__total">
+      <span><i class="pi pi-history" aria-hidden="true"></i> Temps moyen de traitement par dossier</span>
+      <strong class="tabular">
+        @if (avgDecision(); as d) {
+          {{ d.main }} {{ d.mainUnit }} {{ d.rest }} {{ d.restUnit }}
+        } @else {
+          —
+        }
+      </strong>
+    </div>
+  </section>
+</div>

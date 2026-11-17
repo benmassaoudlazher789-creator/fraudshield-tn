@@ -6,15 +6,11 @@ export const ADMIN_ROUTES: Routes = [
   {
     path: 'utilisateurs',
     title: 'Utilisateurs — FraudShield TN',
-    data: { title: 'Utilisateurs' },
-    loadComponent: () =>
-      import('../../shared/under-construction/under-construction').then((m) => m.UnderConstruction),
+    loadComponent: () => import('./users/users').then((m) => m.Users),
   },
   {
     path: 'regles',
     title: 'Règles métier — FraudShield TN',
-    data: { title: 'Règles métier' },
-    loadComponent: () =>
-      import('../../shared/under-construction/under-construction').then((m) => m.UnderConstruction),
+    loadComponent: () => import('./rules/rules').then((m) => m.Rules),
   },
 ];

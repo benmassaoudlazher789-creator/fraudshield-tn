@@ -1,0 +1,264 @@
+<header class="page-header">
+  <div>
+    <h1>Administration &amp; Gestion du Système</h1>
+    <p>Configuration des accès utilisateurs et des règles de surveillance algorithmique</p>
+  </div>
+  <app-admin-tabs />
+</header>
+
+@if (success(); as message) {
+  <div class="banner banner--success" role="status">
+    <i class="pi pi-check-circle" aria-hidden="true"></i>
+    <span>{{ message }}</span>
+    <button type="button" class="banner__close" (click)="success.set(null)" aria-label="Fermer">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+}
+@if (error(); as message) {
+  <div class="banner banner--error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ message }}</span>
+    <button type="button" class="banner__close" (click)="error.set(null)" aria-label="Fermer">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+}
+
+<section class="card">
+  <div class="toolbar">
+    <p-iconfield class="toolbar__search">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="search"
+        variant="filled"
+        [formControl]="searchControl"
+        placeholder="Rechercher par nom, e-mail…"
+        aria-label="Rechercher un utilisateur"
+      />
+    </p-iconfield>
+    <p-select
+      [options]="roleFilterOptions"
+      optionLabel="label"
+      optionValue="value"
+      variant="filled"
+      [ngModel]="roleFilter()"
+      (ngModelChange)="onRoleFilter($event)"
+      ariaLabel="Filtrer par rôle"
+    />
+    <p-select
+      [options]="statusFilterOptions"
+      optionLabel="label"
+      optionValue="value"
+      variant="filled"
+      [ngModel]="statusFilter()"
+      (ngModelChange)="onStatusFilter($event)"
+      ariaLabel="Filtrer par statut"
+    />
+    <p-button label="Ajouter un utilisateur" icon="pi pi-plus" (onClick)="openCreate()" />
+  </div>
+
+  <div class="table-wrap">
+    <p-table
+      [value]="users()"
+      [lazy]="true"
+      (onLazyLoad)="onLazyLoad($event)"
+      [paginator]="true"
+      [rows]="rows()"
+      [first]="first()"
+      [totalRecords]="total()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [loading]="loading()"
+      dataKey="id"
+      styleClass="users-table"
+      currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} utilisateurs"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Nom</th>
+          <th>E-mail</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Date de création</th>
+          <th class="actions">Actions</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-user>
+        <tr>
+          <td>
+            <span class="person">
+              <span class="avatar" [class.avatar--admin]="user.role === 'ADMIN'" aria-hidden="true">
+                {{ initials(user.fullName) }}
+              </span>
+              <span>
+                <span class="person__name">{{ user.fullName }}</span>
+                @if (user.id === currentUserId()) {
+                  <span class="you">(vous)</span>
+                }
+                @if (user.accountRef) {
+                  <span class="person__account">{{ user.accountRef }}</span>
+                }
+              </span>
+            </span>
+          </td>
+          <td class="muted">{{ user.email }}</td>
+          <td><span [class]="roleBadge(user.role)">{{ roleLabel(user.role) }}</span></td>
+          <td>
+            @if (user.enabled) {
+              <span class="fs-badge fs-badge--success">Actif</span>
+            } @else {
+              <span class="fs-badge fs-badge--danger">Désactivé</span>
+            }
+          </td>
+          <td class="tabular nowrap">{{ user.createdAt | date: 'dd MMM yyyy' }}</td>
+          <td class="actions nowrap">
+            <button type="button" class="link" (click)="openEdit(user)">Modifier</button>
+            @if (user.enabled) {
+              <button
+                type="button"
+                class="link link--danger"
+                [disabled]="user.id === currentUserId()"
+                [attr.title]="user.id === currentUserId() ? 'Vous ne pouvez pas désactiver votre propre compte' : null"
+                (click)="askToggle(user)"
+              >Désactiver</button>
+            } @else {
+              <button type="button" class="link link--success" (click)="askToggle(user)">Activer</button>
+            }
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td colspan="6" class="empty">Aucun utilisateur ne correspond à ces critères.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<!-- Création / modification -->
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [header]="dialogMode() === 'create' ? 'Ajouter un utilisateur' : 'Modifier l\'utilisateur'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [style]="{ width: '32rem', maxWidth: 'calc(100vw - 2rem)' }"
+>
+  <form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <!-- Bouton invisible : la touche Entrée valide le formulaire -->
+    <button type="submit" class="sr-submit" tabindex="-1" aria-hidden="true"></button>
+    <div class="field">
+      <label for="fullName">Nom complet</label>
+      <input pInputText id="fullName" formControlName="fullName" variant="filled" autocomplete="name" />
+      @if (isInvalid('fullName')) {
+        <small class="field__error">
+          {{ form.controls.fullName.hasError('maxlength') ? '100 caractères au maximum.' : 'Le nom complet est obligatoire.' }}
+        </small>
+      }
+    </div>
+
+    <div class="field">
+      <label for="email">E-mail</label>
+      <input pInputText id="email" type="email" formControlName="email" variant="filled" autocomplete="off" />
+      @if (dialogMode() === 'edit') {
+        <small class="field__hint">L'e-mail sert d'identifiant de connexion et ne peut pas être modifié.</small>
+      } @else if (isInvalid('email')) {
+        <small class="field__error">
+          @if (form.controls.email.hasError('taken')) {
+            Cet e-mail est déjà utilisé.
+          } @else if (form.controls.email.hasError('required')) {
+            L'e-mail est obligatoire.
+          } @else {
+            Saisissez un e-mail valide.
+          }
+        </small>
+      }
+    </div>
+
+    @if (dialogMode() === 'create') {
+      <div class="field">
+        <label for="password">Mot de passe initial</label>
+        <input pInputText id="password" type="password" formControlName="password" variant="filled" autocomplete="new-password" />
+        @if (isInvalid('password')) {
+          <small class="field__error">Le mot de passe doit contenir entre 8 et 72 caractères.</small>
+        } @else {
+          <small class="field__hint">8 caractères minimum, à communiquer à l'utilisateur.</small>
+        }
+      </div>
+    }
+
+    <div class="field">
+      <label for="role">Rôle</label>
+      <p-select
+        inputId="role"
+        formControlName="role"
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        variant="filled"
+        placeholder="Choisir un rôle"
+        [fluid]="true"
+      />
+      @if (isInvalid('role')) {
+        <small class="field__error">Le rôle est obligatoire.</small>
+      } @else if (selectedRole() === 'CLIENT' && (dialogMode() === 'create' || !editedUser()?.accountRef)) {
+        <small class="field__hint">Un compte bancaire sera ouvert avec un solde de départ de 10 000 DT.</small>
+      }
+    </div>
+
+    @if (formError(); as message) {
+      <div class="form__error" role="alert">
+        <i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ message }}
+      </div>
+    }
+  </form>
+
+  <ng-template #footer>
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
+    <p-button
+      [label]="dialogMode() === 'create' ? 'Créer l\'utilisateur' : 'Enregistrer'"
+      [loading]="saving()"
+      (onClick)="submit()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Confirmation activer / désactiver -->
+<p-dialog
+  [visible]="confirmVisible()"
+  (visibleChange)="confirmVisible.set($event)"
+  [header]="confirmUser()?.enabled ? 'Désactiver le compte' : 'Activer le compte'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '28rem', maxWidth: 'calc(100vw - 2rem)' }"
+>
+  @if (confirmUser(); as user) {
+    @if (user.enabled) {
+      <p class="confirm-text">
+        Désactiver le compte de <strong>{{ user.fullName }}</strong> ? Cette personne ne pourra plus se
+        connecter et ses sessions en cours seront refusées.
+      </p>
+    } @else {
+      <p class="confirm-text">
+        Réactiver le compte de <strong>{{ user.fullName }}</strong> ? Cette personne pourra de nouveau se connecter.
+      </p>
+    }
+  }
+  <ng-template #footer>
+    <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="confirmVisible.set(false)" />
+    <p-button
+      [label]="confirmUser()?.enabled ? 'Désactiver' : 'Activer'"
+      [severity]="confirmUser()?.enabled ? 'danger' : 'success'"
+      [loading]="toggling()"
+      (onClick)="confirmToggle()"
+    />
+  </ng-template>
+</p-dialog>

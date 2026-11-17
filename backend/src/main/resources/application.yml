@@ -40,3 +40,8 @@ app:
     # Score final à partir duquel une transaction passe en A_VERIFIER
     # (le blocage automatique est la règle AUTO_BLOCK_SCORE en base)
     review-threshold: 50
+  ml:
+    # Métriques du modèle (notebook ml/02_entrainement.ipynb) : premier fichier trouvé.
+    # 1. dossier ml/ du projet (backend lancé depuis backend/) ou chemin donné par MODEL_METRICS_PATH
+    # 2. copie dans src/main/resources/ml/model_metrics.json
+    metrics-locations: ${MODEL_METRICS_PATH:file:../ml/models/model_metrics.json},classpath:ml/model_metrics.json

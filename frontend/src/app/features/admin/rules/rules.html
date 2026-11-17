@@ -1,0 +1,100 @@
+<header class="page-header">
+  <div>
+    <h1>Administration &amp; Gestion du Système</h1>
+    <p>Configuration des accès utilisateurs et des règles de surveillance algorithmique</p>
+  </div>
+  <app-admin-tabs />
+</header>
+
+<section>
+  <div class="section-head">
+    <h2>Règles métier de détection en temps réel</h2>
+    <p>Activation et ajustement des seuils de blocage et d'alerte</p>
+  </div>
+
+  <div class="help" role="note">
+    <i class="pi pi-bolt" aria-hidden="true"></i>
+    Les modifications s'appliquent immédiatement aux nouvelles transactions.
+  </div>
+
+  @if (error(); as message) {
+    <div class="error" role="alert">
+      <i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ message }}
+    </div>
+  }
+
+  @if (loading()) {
+    <p class="loading">Chargement des règles…</p>
+  }
+
+  <div class="rules">
+    @for (row of rows(); track row.saved().id) {
+      <form class="rule" [class.rule--off]="!row.saved().enabled" [formGroup]="row.form" (ngSubmit)="save(row)" novalidate>
+        <span class="rule__icon" [class.rule__icon--danger]="row.view.danger" aria-hidden="true">
+          <i [class]="row.view.icon"></i>
+        </span>
+
+        <div class="rule__body">
+          <div class="rule__title">
+            <h3 [id]="'rule-' + row.saved().id">{{ row.view.title }}</h3>
+            @if (row.saved().enabled) {
+              <span class="state state--on">Actif</span>
+            } @else {
+              <span class="state">Inactif</span>
+            }
+          </div>
+          <p>{{ row.view.description }}</p>
+          <code class="rule__code">{{ row.saved().code }}</code>
+        </div>
+
+        <div class="rule__controls">
+          <div class="threshold" [class.threshold--invalid]="thresholdError(row)">
+            <label [for]="'threshold-' + row.saved().id">{{ row.view.fieldLabel }}</label>
+            <p-inputnumber
+              [inputId]="'threshold-' + row.saved().id"
+              formControlName="threshold"
+              mode="decimal"
+              locale="fr-FR"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="row.view.decimals"
+              [useGrouping]="row.view.decimals > 0"
+              inputStyleClass="threshold__input"
+            />
+            <span class="threshold__suffix">{{ row.view.suffix }}</span>
+          </div>
+
+          <p-toggleswitch formControlName="enabled" [ariaLabelledBy]="'rule-' + row.saved().id" />
+
+          <div class="rule__buttons">
+            @if (row.form.dirty) {
+              <p-button label="Annuler" severity="secondary" [text]="true" size="small" (onClick)="cancel(row)" />
+            }
+            <p-button
+              type="submit"
+              label="Enregistrer"
+              icon="pi pi-check"
+              size="small"
+              [loading]="row.saving()"
+              [disabled]="!row.form.dirty"
+            />
+          </div>
+        </div>
+
+        @if (thresholdError(row); as message) {
+          <small class="rule__msg rule__msg--error">{{ message }}</small>
+        } @else if (row.feedback(); as feedback) {
+          <small class="rule__msg" [class.rule__msg--error]="!feedback.ok" [attr.role]="feedback.ok ? 'status' : 'alert'">
+            <i [class]="feedback.ok ? 'pi pi-check-circle' : 'pi pi-exclamation-circle'" aria-hidden="true"></i>
+            {{ feedback.text }}
+          </small>
+        } @else if (row.form.dirty) {
+          <small class="rule__msg rule__msg--pending">Modifications non enregistrées.</small>
+        }
+      </form>
+    } @empty {
+      @if (!loading() && !error()) {
+        <p class="loading">Aucune règle métier configurée.</p>
+      }
+    }
+  </div>
+</section>

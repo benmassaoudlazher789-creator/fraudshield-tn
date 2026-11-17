@@ -17,6 +17,7 @@ import tn.fraudshield.backend.analyst.dto.AlertStatusFilter;
 import tn.fraudshield.backend.analyst.dto.AnalystDecisionRequest;
 import tn.fraudshield.backend.analyst.dto.DashboardResponse;
 import tn.fraudshield.backend.analyst.dto.PageResponse;
+import tn.fraudshield.backend.analyst.dto.StatisticsResponse;
 
 /** Espace analyste (/api/analyst/** réservé à ANALYSTE et ADMIN par SecurityConfig). */
 @RestController
@@ -26,11 +27,18 @@ public class AnalystController {
 
     private final AnalystService analystService;
     private final DashboardService dashboardService;
+    private final StatisticsService statisticsService;
 
     /** Indicateurs du jour + transactions par minute (15 dernières minutes). */
     @GetMapping("/dashboard")
     public DashboardResponse getDashboard() {
         return dashboardService.getDashboard();
+    }
+
+    /** Statistiques sur 7 ou 30 jours (400 pour toute autre valeur). */
+    @GetMapping("/statistics")
+    public StatisticsResponse getStatistics(@RequestParam(defaultValue = "7") int days) {
+        return statisticsService.getStatistics(days);
     }
 
     /** Liste paginée, plus récentes d'abord. Sans status : toutes les alertes. */

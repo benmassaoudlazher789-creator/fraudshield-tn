@@ -157,6 +157,10 @@ public class FraudDecisionService {
         return TransactionStatus.ACCEPTEE;
     }
 
+    /**
+     * Règle lue en base à chaque transaction (pas de cache) : une modification faite
+     * dans l'administration (/api/admin/rules) s'applique dès la transaction suivante.
+     */
     private Optional<BusinessRule> enabledRule(String code) {
         return businessRuleRepository.findByCode(code).filter(r -> Boolean.TRUE.equals(r.getEnabled()));
     }

@@ -1,0 +1,279 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--fs-primary-dark);
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--fs-text-muted);
+  }
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--fs-radius);
+
+  span {
+    flex: 1;
+  }
+
+  &--success {
+    background: var(--fs-success-bg);
+    color: var(--fs-success-text);
+  }
+
+  &--error {
+    background: var(--fs-danger-bg);
+    color: var(--fs-danger-text);
+  }
+
+  &__close {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0.25rem;
+  }
+}
+
+.card {
+  padding: 1.5rem;
+  border-radius: var(--fs-radius-lg);
+  background: var(--fs-surface);
+  box-shadow: var(--fs-shadow-card);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+
+  &__search {
+    flex: 1 1 280px;
+
+    input {
+      width: 100%;
+    }
+  }
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+:host ::ng-deep .users-table {
+  min-width: 880px;
+
+  th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 60px;
+  }
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__name {
+    font-weight: 600;
+  }
+
+  &__account {
+    display: block;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    font-size: 11px;
+    color: var(--fs-text-muted);
+  }
+}
+
+.you {
+  margin-left: 0.25rem;
+  font-size: 12px;
+  color: var(--fs-text-muted);
+}
+
+.avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dce1ff;
+  color: var(--fs-primary-dark);
+  font-size: 13px;
+  font-weight: 700;
+
+  &--admin {
+    background: var(--fs-primary-dark);
+    color: #fff;
+  }
+}
+
+/* Badges de rôle (maquette : client gris-bleu, analyste indigo, administrateur marine) */
+.role {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 0.625rem;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+
+  &--client {
+    background: #dae2fd;
+    color: #3f465c;
+  }
+
+  &--analyst {
+    background: #dce1ff;
+    color: var(--fs-primary);
+  }
+
+  &--admin {
+    background: var(--fs-primary-dark);
+    color: #fff;
+  }
+}
+
+.muted {
+  color: var(--fs-text-muted);
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.actions {
+  text-align: right;
+}
+
+.link {
+  border: 0;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+  font: inherit;
+  font-weight: 600;
+  color: var(--fs-primary-dark);
+  cursor: pointer;
+  border-radius: var(--fs-radius);
+
+  &:hover:not(:disabled) {
+    background: var(--fs-surface-low);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  &--danger {
+    color: #ba1a1a;
+  }
+
+  &--success {
+    color: #047857;
+  }
+}
+
+.empty {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--fs-text-muted);
+}
+
+/* ---------- Modale ---------- */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--fs-radius);
+    background: var(--fs-danger-bg);
+    color: var(--fs-danger-text);
+    font-size: 13px;
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  input {
+    width: 100%;
+  }
+
+  &__error {
+    color: #b91c1c;
+  }
+
+  &__hint {
+    color: var(--fs-text-muted);
+  }
+}
+
+.sr-submit {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.confirm-text {
+  margin: 0;
+  line-height: 22px;
+}
+
+@media (max-width: 639px) {
+  .card {
+    padding: 1rem;
+  }
+}

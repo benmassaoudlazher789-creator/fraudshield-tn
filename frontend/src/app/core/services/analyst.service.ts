@@ -3,7 +3,16 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { AlertDetail, AlertStatus, AlertSummary, Dashboard, DecisionRequest, Page } from '../models/analyst.model';
+import {
+  AlertDetail,
+  AlertStatus,
+  AlertSummary,
+  Dashboard,
+  DecisionRequest,
+  Page,
+  Statistics,
+  StatisticsDays,
+} from '../models/analyst.model';
 
 /** Appels de l'espace analyste (/api/analyst/**, rôles ANALYSTE et ADMIN). */
 @Injectable({ providedIn: 'root' })
@@ -13,6 +22,11 @@ export class AnalystService {
 
   getDashboard(): Observable<Dashboard> {
     return this.http.get<Dashboard>(`${this.baseUrl}/dashboard`);
+  }
+
+  /** Statistiques sur 7 ou 30 jours (fraudes, pays, décisions, métriques du modèle). */
+  getStatistics(days: StatisticsDays): Observable<Statistics> {
+    return this.http.get<Statistics>(`${this.baseUrl}/statistics`, { params: { days } });
   }
 
   /** Liste paginée, plus récentes d'abord ; sans statut = toutes les alertes. */

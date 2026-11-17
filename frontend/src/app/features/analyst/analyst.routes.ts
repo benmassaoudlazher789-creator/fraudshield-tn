@@ -21,8 +21,6 @@ export const ANALYST_ROUTES: Routes = [
   {
     path: 'statistiques',
     title: 'Statistiques — FraudShield TN',
-    data: { title: 'Statistiques' },
-    loadComponent: () =>
-      import('../../shared/under-construction/under-construction').then((m) => m.UnderConstruction),
+    loadComponent: () => import('./statistics/statistics').then((m) => m.Statistics),
   },
 ];

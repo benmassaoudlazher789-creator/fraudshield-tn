@@ -1,0 +1,40 @@
+{
+  "model": "XGBoost",
+  "dataset": "PaySim (TRANSFER + CASH_OUT)",
+  "precision": 0.9933,
+  "recall": 0.9957,
+  "f1": 0.9945,
+  "auc_pr": 0.9974,
+  "threshold": 0.984088,
+  "test_size": 554082,
+  "confusion_matrix": {
+    "tn": 552428,
+    "fp": 11,
+    "fn": 7,
+    "tp": 1636
+  },
+  "models": [
+    {
+      "name": "Régression logistique",
+      "precision": 0.0435,
+      "recall": 0.8996,
+      "f1": 0.0831,
+      "auc_pr": 0.5751
+    },
+    {
+      "name": "Random Forest",
+      "precision": 1.0,
+      "recall": 0.997,
+      "f1": 0.9985,
+      "auc_pr": 0.998
+    },
+    {
+      "name": "XGBoost",
+      "precision": 0.9909,
+      "recall": 0.9963,
+      "f1": 0.9936,
+      "auc_pr": 0.9974
+    }
+  ],
+  "evaluated_at": "2026-11-17T22:31:45+00:00"
+}

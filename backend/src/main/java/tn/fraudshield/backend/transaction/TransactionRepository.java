@@ -1,6 +1,7 @@
 package tn.fraudshield.backend.transaction;
 
 import jakarta.persistence.LockModeType;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -8,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,4 +44,26 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     /** Graphique par minute : date de création et statut des transactions récentes. */
     @Query("select t.createdAt, t.status from Transaction t where t.createdAt >= :from")
     List<Object[]> findCreatedAtAndStatusSince(@Param("from") LocalDateTime from);
+
+    /** Statistiques : date de création et statut des transactions de ces statuts depuis une date. */
+    @Query("select t.createdAt, t.status from Transaction t where t.status in :statuses and t.createdAt >= :from")
+    List<Object[]> findCreatedAtAndStatusByStatusInSince(@Param("statuses") Collection<TransactionStatus> statuses,
+                                                         @Param("from") LocalDateTime from);
+
+    /** Statistiques : [type, nombre, somme des montants] par type de transaction. */
+    @Query("""
+            select t.type, count(t), coalesce(sum(t.amount), 0) from Transaction t
+            where t.status in :statuses and t.createdAt >= :from
+            group by t.type""")
+    List<Object[]> countAndSumByTypeSince(@Param("statuses") Collection<TransactionStatus> statuses,
+                                         @Param("from") LocalDateTime from);
+
+    /** Statistiques : [pays, nombre, somme des montants], du pays le plus fréquent au moins fréquent. */
+    @Query("""
+            select t.country, count(t), coalesce(sum(t.amount), 0) from Transaction t
+            where t.status = :status and t.createdAt >= :from
+            group by t.country
+            order by count(t) desc, t.country""")
+    List<Object[]> countAndSumByCountrySince(@Param("status") TransactionStatus status,
+                                             @Param("from") LocalDateTime from, Pageable pageable);
 }

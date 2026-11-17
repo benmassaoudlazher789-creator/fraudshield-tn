@@ -96,6 +96,63 @@ export interface Dashboard {
   generatedAt: string;
 }
 
+/** Période de la page Statistiques. */
+export type StatisticsDays = 7 | 30;
+
+/** Transactions suspectes créées un jour donné (statut actuel). */
+export interface DayBucket {
+  date: string; // AAAA-MM-JJ
+  blocked: number;
+  review: number;
+  total: number;
+}
+
+export interface TypeBucket {
+  type: TransactionType;
+  count: number;
+  amount: number;
+}
+
+export interface CountryBucket {
+  country: string;
+  count: number;
+  amount: number;
+}
+
+/** Métriques du modèle sur le jeu de test (ml/models/model_metrics.json). */
+export interface ModelMetrics {
+  model: string | null;
+  dataset: string | null;
+  precision: number | null;
+  recall: number | null;
+  f1: number | null;
+  aucPr: number | null;
+  threshold: number | null;
+  testSize: number | null;
+  confusionMatrix: { tn: number; fp: number; fn: number; tp: number } | null;
+  models: { name: string; precision: number; recall: number; f1: number; aucPr: number }[] | null;
+  evaluatedAt: string | null;
+}
+
+/** GET /api/analyst/statistics?days=7|30 */
+export interface Statistics {
+  days: StatisticsDays;
+  from: string;
+  to: string;
+  summary: {
+    alerts: number;
+    previousAlerts: number;
+    blockedAmount: number;
+    avgDecisionSeconds: number | null;
+  };
+  fraudsPerDay: DayBucket[];
+  fraudsByType: TypeBucket[];
+  topCountries: CountryBucket[];
+  analystDecisions: { fraudConfirmed: number; falsePositive: number };
+  modelMetrics: ModelMetrics | null;
+  generatedAt: string;
+}
+
 /** Message WebSocket /topic/transactions. */
 export interface TransactionNotification {
   id: number;
