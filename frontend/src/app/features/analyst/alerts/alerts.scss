@@ -1,0 +1,125 @@
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    margin: 0.125rem 0 0;
+    font-size: 28px;
+    line-height: 36px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0.25rem 0 0;
+    color: var(--fs-text-muted);
+  }
+}
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--fs-text-muted);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--fs-radius);
+  background: var(--fs-danger-bg);
+  color: var(--fs-danger-text);
+}
+
+.card {
+  border-radius: var(--fs-radius-lg);
+  background: var(--fs-surface);
+  box-shadow: var(--fs-shadow-card);
+  overflow-x: auto;
+}
+
+:host ::ng-deep .alerts-table {
+  min-width: 960px;
+
+  th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    height: 52px;
+  }
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.num {
+  text-align: right;
+}
+
+.nowrap {
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--fs-text-muted);
+}
+
+.strong {
+  font-weight: 600;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12px;
+  color: var(--fs-text-muted);
+  white-space: nowrap;
+}
+
+.country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.score {
+  min-width: 160px;
+}
+
+.details {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--fs-radius);
+  background: var(--fs-surface-high);
+  color: var(--fs-text);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: #dae2fd;
+  }
+}
+
+.empty {
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--fs-text-muted);
+}

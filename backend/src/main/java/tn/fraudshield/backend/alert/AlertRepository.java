@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +26,12 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
     /** Toutes les alertes (sans filtre de statut). */
     @EntityGraph(attributePaths = {"transaction", "transaction.account", "transaction.account.user"})
     Page<Alert> findAllBy(Pageable pageable);
+
+    /** Tableau de bord : alertes créées depuis une date. */
+    long countByCreatedAtGreaterThanEqual(LocalDateTime from);
+
+    /** Tableau de bord : alertes d'une décision encore sans décision d'analyste. */
+    long countByDecisionAndAnalystDecisionIsNull(AlertDecision decision);
 
     /** Verrou en écriture : deux analystes ne peuvent pas décider en même temps. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)

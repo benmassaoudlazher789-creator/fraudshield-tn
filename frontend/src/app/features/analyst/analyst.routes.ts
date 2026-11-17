@@ -6,16 +6,17 @@ export const ANALYST_ROUTES: Routes = [
   {
     path: 'tableau-de-bord',
     title: 'Tableau de bord — FraudShield TN',
-    data: { title: 'Tableau de bord' },
-    loadComponent: () =>
-      import('../../shared/under-construction/under-construction').then((m) => m.UnderConstruction),
+    loadComponent: () => import('./dashboard/dashboard').then((m) => m.Dashboard),
   },
   {
     path: 'alertes',
     title: 'Alertes — FraudShield TN',
-    data: { title: 'Alertes' },
-    loadComponent: () =>
-      import('../../shared/under-construction/under-construction').then((m) => m.UnderConstruction),
+    loadComponent: () => import('./alerts/alerts').then((m) => m.Alerts),
+  },
+  {
+    path: 'alertes/:id',
+    title: "Détail d'une alerte — FraudShield TN",
+    loadComponent: () => import('./alert-detail/alert-detail').then((m) => m.AlertDetailPage),
   },
   {
     path: 'statistiques',

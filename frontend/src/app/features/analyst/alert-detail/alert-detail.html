@@ -1,0 +1,237 @@
+<div class="topline">
+  <a routerLink="/analyste/alertes" class="back"><i class="pi pi-arrow-left" aria-hidden="true"></i> Retour aux alertes</a>
+  @if (detail(); as d) {
+    <span class="detected">
+      <i class="pi pi-clock" aria-hidden="true"></i>
+      Détectée le <strong class="tabular">{{ d.createdAt | date: 'dd/MM/yyyy à HH:mm:ss' }}</strong>
+    </span>
+  }
+</div>
+
+@if (loading()) {
+  <section class="card placeholder">Chargement de l'alerte…</section>
+} @else if (loadError(); as message) {
+  <section class="card placeholder placeholder--error" role="alert">
+    <i class="pi pi-exclamation-circle" aria-hidden="true"></i>{{ message }}
+  </section>
+} @else if (detail(); as d) {
+  <!-- En-tête -->
+  <section class="card head">
+    <div class="head__title">
+      <h1>Alerte #{{ d.id }}</h1>
+      <app-alert-badge [decision]="d.decision" [analystDecision]="d.analystDecision" />
+    </div>
+    <div class="score-box" [class]="scoreLevel()">
+      <div class="score-box__text">
+        <span class="score-box__label">Indice de risque</span>
+        <span class="score-box__hint">Modèle IA et règles métier</span>
+      </div>
+      <div class="score-box__value tabular"><strong>{{ d.score }}</strong>/100</div>
+    </div>
+  </section>
+
+  <div class="row row--top">
+    <!-- Détails de la transaction -->
+    <section class="card">
+      <header class="card__header">
+        <span class="card__icon"><i class="pi pi-receipt" aria-hidden="true"></i></span>
+        <h2>Détails de la transaction</h2>
+        <span class="tag tabular">ID : {{ d.transaction.id }}</span>
+      </header>
+
+      <div class="amount">
+        <div>
+          <span class="amount__label">Montant intercepté</span>
+          <span class="amount__value tabular">{{ d.transaction.amount | dt: false }}<small>DT</small></span>
+        </div>
+        <span class="amount__icon"><i class="pi pi-exclamation-triangle" aria-hidden="true"></i></span>
+      </div>
+
+      <dl class="facts">
+        <div><dt>Titulaire du compte</dt><dd class="strong">{{ d.client.fullName }}</dd></div>
+        <div><dt>E-mail</dt><dd>{{ d.client.email }}</dd></div>
+        <div><dt>Compte</dt><dd class="mono">{{ d.accountRef }}</dd></div>
+        <div><dt>Établissement bancaire</dt><dd>{{ d.bank }}</dd></div>
+        <div><dt>Bénéficiaire</dt><dd class="strong">{{ d.transaction.beneficiary }}</dd></div>
+        <div><dt>Type d'opération</dt><dd>{{ typeLabel(d.transaction.type) }}</dd></div>
+        <div>
+          <dt>Destination</dt>
+          <dd class="country"><app-flag [code]="d.transaction.country" />{{ countryName(d.transaction.country) }}</dd>
+        </div>
+        <div><dt>Horodatage</dt><dd class="tabular">{{ d.transaction.createdAt | date: 'dd/MM/yyyy HH:mm:ss' }}</dd></div>
+        <div><dt>Statut actuel</dt><dd><app-status-badge [status]="d.transaction.status" /></dd></div>
+      </dl>
+    </section>
+
+    <!-- Pourquoi cette alerte ? -->
+    <section class="card">
+      <header class="card__header">
+        <span class="card__icon card__icon--green"><i class="pi pi-lightbulb" aria-hidden="true"></i></span>
+        <div>
+          <h2>Pourquoi cette alerte ?</h2>
+          <p>Explications du modèle IA (SHAP) et règles métier déclenchées</p>
+        </div>
+      </header>
+
+      <ul class="reasons">
+        @for (r of reasons(); track $index) {
+          <li class="reason">
+            <div class="reason__top">
+              <span class="reason__label">{{ r.label }}</span>
+              <span class="source" [class.source--rule]="r.source === 'REGLE'">
+                {{ r.source === 'REGLE' ? 'Règle métier' : 'Modèle IA' }}
+              </span>
+            </div>
+            <div class="bar" role="img" [attr.aria-label]="(r.increases ? 'Augmente' : 'Diminue') + ' le risque'">
+              <span class="bar__fill" [class.bar__fill--down]="!r.increases" [style.width.%]="r.width"></span>
+            </div>
+            <div class="reason__meta">
+              <span>{{ r.valueText ? 'Valeur : ' + r.valueText : '' }}</span>
+              <span [class.up]="r.increases" [class.down]="!r.increases">
+                {{ r.impactText }} · {{ r.increases ? 'augmente le risque' : 'diminue le risque' }}
+              </span>
+            </div>
+          </li>
+        } @empty {
+          <li class="empty">Aucune explication disponible pour cette alerte.</li>
+        }
+      </ul>
+
+      <div class="total" [class]="scoreLevel()">
+        <i class="pi pi-calculator" aria-hidden="true"></i>
+        Score final : <strong class="tabular">{{ d.score }} / 100</strong>
+        <span class="total__note">max(score du modèle, scores des règles)</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="row row--bottom">
+    <!-- Historique du client -->
+    <section class="card card--flush">
+      <header class="card__header">
+        <span class="card__icon"><i class="pi pi-history" aria-hidden="true"></i></span>
+        <h2>Historique du client</h2>
+        <span class="tag">Opération en alerte + 6 précédentes</span>
+      </header>
+      <div class="table-wrap">
+        <table class="history">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Bénéficiaire / type</th>
+              <th class="num">Montant</th>
+              <th>Pays</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (tx of history(); track tx.id; let first = $first) {
+              <tr [class.current]="first">
+                <td class="tabular nowrap">{{ tx.createdAt | shortDate }}</td>
+                <td>
+                  <span class="strong">{{ tx.beneficiary }}</span>
+                  <span class="sub">{{ typeLabel(tx.type) }}</span>
+                </td>
+                <td class="num tabular nowrap">{{ tx.amount | dt: false }} <span class="unit">DT</span></td>
+                <td><span class="country"><app-flag [code]="tx.country" />{{ tx.country }}</span></td>
+                <td><app-status-badge [status]="tx.status" /></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Décision de l'analyste -->
+    <section class="card decision">
+      <header class="card__header">
+        <span class="card__icon card__icon--dark"><i class="pi pi-check-square" aria-hidden="true"></i></span>
+        <h2>Décision &amp; traitement analyste</h2>
+      </header>
+
+      @if (feedback(); as f) {
+        <p-message [severity]="f.severity" styleClass="feedback">{{ f.text }}</p-message>
+      }
+
+      @if (d.analystDecision) {
+        <div class="decided">
+          <app-alert-badge [decision]="d.decision" [analystDecision]="d.analystDecision" />
+          <p>
+            Décidée par <strong>{{ d.analystName ?? 'un analyste' }}</strong>
+            le <span class="tabular">{{ d.decidedAt | date: 'dd/MM/yyyy à HH:mm' }}</span>.
+          </p>
+        </div>
+      }
+
+      <div class="field">
+        <div class="field__row">
+          <label for="comment">Commentaire de l'analyste</label>
+          <span class="hint">Requis pour clôturer</span>
+        </div>
+        <textarea
+          pTextarea
+          id="comment"
+          rows="4"
+          [formControl]="comment"
+          placeholder="Motifs de votre décision, constatations d'enquête, contact avec le client…"
+          aria-describedby="comment-error"
+        ></textarea>
+        @if (comment.invalid && comment.touched) {
+          <small id="comment-error" class="field__error">Un commentaire est requis pour enregistrer la décision.</small>
+        }
+      </div>
+
+      @if (!decided()) {
+        <div class="quick">
+          <span class="quick__label">Motifs rapides :</span>
+          @for (reason of quickReasons; track reason) {
+            <button type="button" class="chip" (click)="addQuickReason(reason)">+ {{ reason }}</button>
+          }
+        </div>
+      }
+
+      <div class="actions">
+        <p-button
+          label="Confirmer la fraude"
+          icon="pi pi-ban"
+          severity="danger"
+          [fluid]="true"
+          [disabled]="decided() || submitting()"
+          [loading]="submitting() && pendingDecision() === 'FRAUDE_CONFIRMEE'"
+          (onClick)="askDecision('FRAUDE_CONFIRMEE')"
+        />
+        <p-button
+          label="Faux positif"
+          icon="pi pi-check-circle"
+          severity="success"
+          [fluid]="true"
+          [disabled]="decided() || submitting()"
+          [loading]="submitting() && pendingDecision() === 'FAUX_POSITIF'"
+          (onClick)="askDecision('FAUX_POSITIF')"
+        />
+      </div>
+    </section>
+  </div>
+
+  <!-- Modale de confirmation -->
+  <p-dialog
+    [(visible)]="dialogVisible"
+    [header]="dialogTitle()"
+    [modal]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [dismissableMask]="true"
+    styleClass="decision-dialog"
+  >
+    <p class="dialog-text">{{ dialogText() }}</p>
+    <p class="dialog-note">Cette décision est définitive et sera tracée à votre nom.</p>
+    <ng-template #footer>
+      <p-button label="Annuler" severity="secondary" [text]="true" (onClick)="dialogVisible.set(false)" />
+      <p-button
+        [label]="pendingDecision() === 'FRAUDE_CONFIRMEE' ? 'Confirmer la fraude' : 'Valider le faux positif'"
+        [severity]="pendingDecision() === 'FRAUDE_CONFIRMEE' ? 'danger' : 'success'"
+        (onClick)="confirmDecision()"
+      />
+    </ng-template>
+  </p-dialog>
+}
