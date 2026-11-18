@@ -6,9 +6,10 @@ spring:
     name: fraudshield-backend
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/fraudshield
-    username: fraudshield
-    password: fraudshield
+    # Valeurs de développement (docker-compose.yml), surchargées par variables d'environnement
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/fraudshield}
+    username: ${DB_USERNAME:fraudshield}
+    password: ${DB_PASSWORD:fraudshield}
 
   jpa:
     hibernate:
@@ -28,6 +29,7 @@ spring:
 
 app:
   jwt:
+    # Clé de développement uniquement : en production, définir JWT_SECRET (32 caractères minimum)
     secret: ${JWT_SECRET:fraudshield-dev-secret-key-change-me-in-production-2026}
     expiration-ms: 86400000
   cors:

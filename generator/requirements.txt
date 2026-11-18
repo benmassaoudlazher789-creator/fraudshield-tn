@@ -1,0 +1,3 @@
+# Générateur de trafic FraudShield TN (Python >= 3.10)
+# Déjà installé dans ml/.venv : aucune installation nécessaire si vous utilisez cet environnement.
+requests>=2.31,<3

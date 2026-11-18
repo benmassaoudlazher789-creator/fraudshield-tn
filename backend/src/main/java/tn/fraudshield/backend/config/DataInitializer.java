@@ -3,6 +3,7 @@ package tn.fraudshield.backend.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +18,14 @@ import tn.fraudshield.backend.user.UserRepository;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Données de démonstration de base (admin, analyste, client, règles), créées sur une base vide.
+ * S'exécute avant DemoClientsInitializer : celui-ci ajoute des utilisateurs, ce qui ferait
+ * échouer le test "base vide" ci-dessous s'il passait en premier.
+ */
 @Slf4j
 @Component
+@Order(1)
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 

@@ -11,7 +11,7 @@ import java.util.List;
 
 /**
  * WebSocket STOMP : endpoint /ws, broker mémoire simple sur /topic.
- * Les requêtes de même origine (ex : /ws-test.html servi par le backend) sont toujours acceptées.
+ * Seules les origines de app.cors.allowed-origins (frontend Angular) peuvent ouvrir la connexion.
  */
 @Configuration
 @EnableWebSocketMessageBroker

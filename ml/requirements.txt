@@ -1,0 +1,11 @@
+# Notebooks ml/ (exploration + entraînement) et générateur de trafic (Python >= 3.12)
+# Versions de l'environnement ml/.venv utilisé pour entraîner le modèle livré dans ml/models/
+pandas==3.1.1
+numpy==2.5.4
+scikit-learn==1.9.1
+xgboost==3.4.1
+shap==0.54.1
+matplotlib==3.11.2
+seaborn==0.13.2
+jupyter==1.1.1
+requests==2.34.2
