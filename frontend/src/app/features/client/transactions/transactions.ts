@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RouterLink } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 
@@ -13,13 +14,14 @@ import {
 import { DtPipe } from '../../../core/pipes/dt.pipe';
 import { ClientService } from '../../../core/services/client.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { Flag } from '../../../shared/flag/flag';
 import { StatusBadge } from '../../../shared/status-badge/status-badge';
 
 /** Page /client/transactions : historique du client sous forme de tableau triable. */
 @Component({
   selector: 'app-transactions',
-  imports: [DatePipe, ButtonModule, TableModule, DtPipe, StatusBadge, Flag],
+  imports: [DatePipe, RouterLink, ButtonModule, TableModule, DtPipe, EmptyState, StatusBadge, Flag],
   templateUrl: './transactions.html',
   styleUrl: './transactions.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

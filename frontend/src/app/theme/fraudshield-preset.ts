@@ -4,6 +4,7 @@ import Aura from '@primeuix/themes/aura';
 /**
  * Thème PrimeNG FraudShield : Aura avec une palette primaire centrée sur le bleu
  * institutionnel des maquettes (#1E3A8A en 500, utilisé par défaut par les composants).
+ * Mode sombre (classe .fs-dark sur <html>) : surfaces bleu nuit alignées sur les tokens de styles.scss.
  */
 const FraudShieldPreset = definePreset(Aura, {
   semantic: {
@@ -23,8 +24,38 @@ const FraudShieldPreset = definePreset(Aura, {
     focusRing: {
       width: '2px',
       style: 'solid',
-      color: '#3b82f6',
+      color: 'var(--fs-focus)',
       offset: '2px',
+    },
+    colorScheme: {
+      dark: {
+        surface: {
+          0: '#ffffff',
+          50: '#e6eaf3',
+          100: '#c9d0de',
+          200: '#a7b0c4',
+          300: '#8d97ab',
+          400: '#6b7590',
+          500: '#4c5670',
+          600: '#323d56',
+          700: '#2a3650',
+          800: '#1a2338',
+          900: '#131b2e',
+          950: '#0b1120',
+        },
+        // Bleu éclairci : texte sombre dessus (contraste 7:1)
+        primary: {
+          color: '{primary.300}',
+          contrastColor: '{surface.950}',
+          hoverColor: '{primary.200}',
+          activeColor: '{primary.100}',
+        },
+        // Texte secondaire (paginateur, placeholders…) : AA sur les surfaces sombres
+        text: {
+          mutedColor: '{surface.300}',
+          hoverMutedColor: '{surface.200}',
+        },
+      },
     },
   },
 });

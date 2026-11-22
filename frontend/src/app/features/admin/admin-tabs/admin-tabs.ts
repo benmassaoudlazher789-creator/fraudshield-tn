@@ -32,9 +32,11 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       color: var(--fs-text-muted);
       font-weight: 600;
       text-decoration: none;
+      transition: background-color 0.15s, color 0.15s;
     }
     a:hover {
-      color: var(--fs-primary-dark);
+      color: var(--fs-brand-strong);
+      background: var(--fs-surface);
     }
     a.active {
       background: var(--fs-primary);

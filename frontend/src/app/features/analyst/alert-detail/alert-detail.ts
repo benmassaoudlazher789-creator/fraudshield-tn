@@ -21,11 +21,13 @@ import { TextareaModule } from 'primeng/textarea';
 import { AlertDetail, AlertReason, AnalystDecision, TransactionInfo } from '../../../core/models/analyst.model';
 import { TYPE_LABELS, TransactionType, countryName } from '../../../core/models/client.model';
 import { DtPipe, formatDt } from '../../../core/pipes/dt.pipe';
-import { ShortDatePipe } from '../../../core/pipes/short-date.pipe';
 import { AnalystService } from '../../../core/services/analyst.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
 import { AlertBadge } from '../../../shared/alert-badge/alert-badge';
+import { ClientTimeline } from '../../../shared/client-timeline/client-timeline';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { Flag } from '../../../shared/flag/flag';
+import { ScoreGauge } from '../../../shared/score-gauge/score-gauge';
 import { StatusBadge } from '../../../shared/status-badge/status-badge';
 
 /** Raison préparée pour l'affichage (barre horizontale). */
@@ -72,9 +74,11 @@ function notBlank(control: AbstractControl<string>): ValidationErrors | null {
     MessageModule,
     TextareaModule,
     DtPipe,
-    ShortDatePipe,
     AlertBadge,
+    ClientTimeline,
+    EmptyState,
     Flag,
+    ScoreGauge,
     StatusBadge,
   ],
   templateUrl: './alert-detail.html',

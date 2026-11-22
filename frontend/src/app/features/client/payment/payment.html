@@ -193,7 +193,15 @@
     </header>
 
     @if (loading()) {
-      <p class="empty">Chargement…</p>
+      <ul class="tx-list" aria-busy="true" aria-label="Chargement des transactions">
+        @for (i of [0, 1, 2, 3]; track i) {
+          <li class="tx tx--skeleton" aria-hidden="true">
+            <span class="fs-skeleton fs-skeleton--circle" style="width: 20px; height: 20px"></span>
+            <span class="tx__main"><span class="fs-skeleton" style="width: 70%"></span></span>
+            <span class="fs-skeleton" style="width: 25%"></span>
+          </li>
+        }
+      </ul>
     } @else {
       <ul class="tx-list">
         @for (tx of recent(); track tx.id) {
@@ -209,7 +217,7 @@
             </div>
           </li>
         } @empty {
-          <li class="empty">Aucune transaction pour le moment.</li>
+          <li><app-empty-state [compact]="true" icon="pi pi-wallet" title="Aucune transaction pour le moment" message="Votre premier paiement apparaîtra ici avec son statut." /></li>
         }
       </ul>
     }

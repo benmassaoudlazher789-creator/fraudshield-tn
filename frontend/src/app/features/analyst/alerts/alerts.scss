@@ -18,6 +18,13 @@
     margin: 0.25rem 0 0;
     color: var(--fs-text-muted);
   }
+
+  @media (max-width: 767px) {
+    p-selectbutton {
+      width: 100%;
+      overflow-x: auto;
+    }
+  }
 }
 
 .eyebrow {
@@ -44,14 +51,19 @@
   background: var(--fs-surface);
   box-shadow: var(--fs-shadow-card);
   overflow-x: auto;
+
+  @media (max-width: 767px) {
+    background: transparent;
+    box-shadow: none;
+  }
 }
 
 :host ::ng-deep .alerts-table {
   min-width: 960px;
 
   th {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--fs-table-head);
+    color: var(--fs-table-head-text);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -62,10 +74,52 @@
   td {
     height: 52px;
   }
+
+  /* Bordure gauche colorée selon la décision */
+  tbody > tr {
+    --row-accent: transparent;
+
+    > td:first-child {
+      box-shadow: inset 3px 0 0 var(--row-accent);
+    }
+  }
+
+  .row--danger { --row-accent: var(--fs-danger); }
+  .row--warning { --row-accent: var(--fs-warning); }
+  .row--success { --row-accent: var(--fs-success); }
+
+  .skeleton-cell {
+    height: 52px;
+  }
+
+  @media (max-width: 767px) {
+    min-width: 0;
+
+    tbody > tr {
+      box-shadow: inset 4px 0 0 var(--row-accent);
+
+      > td:first-child {
+        box-shadow: none;
+      }
+    }
+
+    .score {
+      min-width: 0;
+
+      app-score-bar {
+        width: 60%;
+      }
+    }
+  }
 }
 
 .clickable {
   cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover > td {
+    background: var(--fs-row-hover);
+  }
 }
 
 .num {
@@ -114,12 +168,12 @@
   text-decoration: none;
 
   &:hover {
-    background: #dae2fd;
+    background: var(--fs-hover-soft);
   }
 }
 
-.empty {
-  padding: 2rem 0;
-  text-align: center;
-  color: var(--fs-text-muted);
+
+/* Libellés du filtre sur une ligne (mobile : défilement horizontal) */
+:host ::ng-deep p-selectbutton .p-togglebutton {
+  white-space: nowrap;
 }

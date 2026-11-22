@@ -31,39 +31,41 @@
     [totalRecords]="total()"
     [rowsPerPageOptions]="[10, 20, 50]"
     [loading]="loading()"
+    [showLoader]="alerts().length > 0"
     dataKey="id"
-    styleClass="alerts-table"
+    styleClass="alerts-table fs-stack-table"
     currentPageReportTemplate="{first} – {last} sur {totalRecords}"
     [showCurrentPageReport]="true"
   >
     <ng-template #header>
       <tr>
-        <th>N°</th>
-        <th>Date</th>
-        <th>Client</th>
-        <th>Compte</th>
-        <th class="num">Montant</th>
-        <th>Pays</th>
-        <th>Score</th>
-        <th>Statut</th>
-        <th></th>
+        <th scope="col">N°</th>
+        <th scope="col">Date</th>
+        <th scope="col">Client</th>
+        <th scope="col">Compte</th>
+        <th scope="col" class="num">Montant</th>
+        <th scope="col">Pays</th>
+        <th scope="col">Score</th>
+        <th scope="col">Statut</th>
+        <th scope="col"><span class="sr-only">Actions</span></th>
       </tr>
     </ng-template>
 
     <ng-template #body let-alert>
-      <tr class="clickable" (click)="openAlert(alert)">
-        <td class="tabular muted">#{{ alert.id }}</td>
-        <td class="tabular nowrap">{{ alert.createdAt | date: 'dd/MM HH:mm:ss' }}</td>
-        <td class="strong">{{ alert.clientName }}</td>
-        <td class="mono">{{ alert.accountRef }}</td>
-        <td class="num tabular nowrap">{{ alert.amount | dt }}</td>
-        <td><span class="country"><app-flag [code]="alert.country" />{{ alert.country }}</span></td>
-        <td class="score"><app-score-bar [score]="alert.score" /></td>
-        <td><app-alert-badge [decision]="alert.decision" [analystDecision]="alert.analystDecision" /></td>
+      <tr class="clickable" [class]="rowTone(alert)" (click)="openAlert(alert)">
+        <td data-label="N°" class="tabular muted">#{{ alert.id }}</td>
+        <td data-label="Date" class="tabular nowrap">{{ alert.createdAt | date: 'dd/MM HH:mm:ss' }}</td>
+        <td data-label="Client" class="strong">{{ alert.clientName }}</td>
+        <td data-label="Compte" class="mono">{{ alert.accountRef }}</td>
+        <td data-label="Montant" class="num tabular nowrap">{{ alert.amount | dt }}</td>
+        <td data-label="Pays"><span class="country"><app-flag [code]="alert.country" />{{ alert.country }}</span></td>
+        <td data-label="Score" class="score"><app-score-bar [score]="alert.score" /></td>
+        <td data-label="Statut"><app-alert-badge [decision]="alert.decision" [analystDecision]="alert.analystDecision" /></td>
         <td class="num">
           <a
             class="details"
             [routerLink]="['/analyste/alertes', alert.id]"
+            [attr.aria-label]="'Détails de l’alerte ' + alert.id"
             (click)="$event.stopPropagation()"
           >Détails</a>
         </td>
@@ -71,9 +73,23 @@
     </ng-template>
 
     <ng-template #emptymessage>
-      <tr>
-        <td colspan="9" class="empty">Aucune alerte pour ce filtre.</td>
-      </tr>
+      @if (loading()) {
+        @for (i of skeletonRows; track i) {
+          <tr aria-hidden="true">
+            <td colspan="9" class="skeleton-cell fs-stack-full"><span class="fs-skeleton"></span></td>
+          </tr>
+        }
+      } @else {
+        <tr>
+          <td colspan="9" class="fs-stack-full">
+            <app-empty-state
+              icon="pi pi-filter-slash"
+              title="Aucune alerte pour ce filtre"
+              message="Essayez un autre statut ou revenez plus tard : les nouvelles alertes arrivent en temps réel."
+            />
+          </td>
+        </tr>
+      }
     </ng-template>
   </p-table>
 </section>

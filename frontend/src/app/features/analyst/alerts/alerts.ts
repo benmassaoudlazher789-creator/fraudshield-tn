@@ -20,7 +20,9 @@ import { DtPipe } from '../../../core/pipes/dt.pipe';
 import { RealtimeService } from '../../../core/realtime/realtime.service';
 import { AnalystService } from '../../../core/services/analyst.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { alertRowTone } from '../../../core/utils/alert-tone';
 import { AlertBadge } from '../../../shared/alert-badge/alert-badge';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { Flag } from '../../../shared/flag/flag';
 import { ScoreBar } from '../../../shared/score-bar/score-bar';
 
@@ -31,7 +33,7 @@ const VALID_STATUSES: AlertStatus[] = ['A_VERIFIER', 'BLOQUEE', 'TRAITEE'];
 /** Page /analyste/alertes : liste paginée (côté serveur) avec filtre par statut. */
 @Component({
   selector: 'app-alerts',
-  imports: [DatePipe, FormsModule, RouterLink, SelectButtonModule, TableModule, DtPipe, AlertBadge, Flag, ScoreBar],
+  imports: [DatePipe, FormsModule, RouterLink, SelectButtonModule, TableModule, DtPipe, AlertBadge, EmptyState, Flag, ScoreBar],
   templateUrl: './alerts.html',
   styleUrl: './alerts.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -61,6 +63,7 @@ export class Alerts implements OnInit {
   protected readonly rows = signal(20);
   protected readonly loading = signal(true);
   protected readonly error = signal<string | null>(null);
+  protected readonly skeletonRows = [0, 1, 2, 3, 4, 5];
 
   ngOnInit(): void {
     const initial = this.status() as AlertStatus | undefined;
@@ -93,6 +96,8 @@ export class Alerts implements OnInit {
     });
     this.load();
   }
+
+  protected readonly rowTone = alertRowTone;
 
   protected openAlert(alert: AlertSummary): void {
     void this.router.navigate(['/analyste/alertes', alert.id]);

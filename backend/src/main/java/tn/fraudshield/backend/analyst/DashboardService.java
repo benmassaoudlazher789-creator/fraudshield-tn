@@ -7,6 +7,7 @@ import tn.fraudshield.backend.alert.AlertDecision;
 import tn.fraudshield.backend.alert.AlertRepository;
 import tn.fraudshield.backend.analyst.dto.DashboardResponse;
 import tn.fraudshield.backend.analyst.dto.DashboardResponse.MinuteBucket;
+import tn.fraudshield.backend.analyst.dto.DashboardResponse.Yesterday;
 import tn.fraudshield.backend.transaction.TransactionRepository;
 import tn.fraudshield.backend.transaction.TransactionStatus;
 
@@ -52,7 +53,18 @@ public class DashboardService {
                 alertRepository.countByDecisionAndAnalystDecisionIsNull(AlertDecision.A_VERIFIER),
                 decisions,
                 perMinute(now),
+                yesterday(startOfDay, now),
                 now);
+    }
+
+    /** Indicateurs de la veille entre 0 h et la même heure qu'aujourd'hui. */
+    private Yesterday yesterday(LocalDateTime startOfDay, LocalDateTime now) {
+        LocalDateTime from = startOfDay.minusDays(1);
+        LocalDateTime to = now.minusDays(1);
+        return new Yesterday(
+                transactionRepository.countByCreatedAtGreaterThanEqualAndCreatedAtLessThan(from, to),
+                alertRepository.countByCreatedAtGreaterThanEqualAndCreatedAtLessThan(from, to),
+                transactionRepository.sumAmountByStatusBetween(TransactionStatus.BLOQUEE, from, to));
     }
 
     /** Transactions par minute sur les 15 dernières minutes (minute courante incluse). */

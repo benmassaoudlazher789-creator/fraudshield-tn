@@ -8,6 +8,7 @@ import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { BusinessRule } from '../../../core/models/admin.model';
 import { AdminService } from '../../../core/services/admin.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { AdminTabs } from '../admin-tabs/admin-tabs';
 
 /** Présentation d'une règle : texte, icône et contraintes du champ seuil. */
@@ -72,7 +73,7 @@ interface RuleRow {
 /** Page /admin/regles : seuils et activation des règles métier, appliqués immédiatement. */
 @Component({
   selector: 'app-rules',
-  imports: [ReactiveFormsModule, ButtonModule, InputNumberModule, ToggleSwitchModule, AdminTabs],
+  imports: [ReactiveFormsModule, ButtonModule, InputNumberModule, ToggleSwitchModule, AdminTabs, EmptyState],
   templateUrl: './rules.html',
   styleUrl: './rules.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

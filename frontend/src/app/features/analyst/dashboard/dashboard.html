@@ -16,87 +16,136 @@
 }
 
 <!-- KPI du jour -->
-<section class="kpis">
-  <article class="kpi">
-    <div class="kpi__head">
-      <span class="kpi__label">Transactions aujourd'hui</span>
-      <span class="kpi__icon kpi__icon--blue"><i class="pi pi-credit-card"></i></span>
-    </div>
-    <span class="kpi__value tabular">{{ data()?.transactionsToday ?? '—' }}</span>
-    <div class="kpi__foot">
-      @if (inProgress() > 0) {
-        {{ inProgress() }} en cours de scoring
-      } @else {
-        Flux à jour
-      }
-    </div>
-  </article>
+<section class="kpis" aria-label="Indicateurs du jour" [attr.aria-busy]="loading()">
+  @if (loading() && !data()) {
+    @for (i of skeletonRows; track i) {
+      <div class="kpi" aria-hidden="true">
+        <span class="fs-skeleton" style="width: 60%"></span>
+        <span class="fs-skeleton fs-skeleton--value"></span>
+        <span class="fs-skeleton" style="height: 28px"></span>
+        <span class="fs-skeleton" style="width: 45%"></span>
+      </div>
+    }
+  } @else {
+    <article class="kpi">
+      <div class="kpi__head">
+        <span class="kpi__label">Transactions aujourd'hui</span>
+        <span class="kpi__icon kpi__icon--blue"><i class="pi pi-credit-card" aria-hidden="true"></i></span>
+      </div>
+      <div class="kpi__row">
+        <span class="kpi__value tabular"><app-count-up [value]="data()?.transactionsToday" /></span>
+        @if (trends()?.transactions; as t) {
+          <span class="trend" [class]="'trend--' + t.tone" [attr.title]="t.title">
+            <i [class]="t.icon" aria-hidden="true"></i>{{ t.text }}<span class="sr-only"> par rapport à hier. {{ t.title }}</span>
+          </span>
+        }
+      </div>
+      <app-sparkline [values]="sparks().transactions" label="Transactions par minute, 15 dernières minutes" />
+      <div class="kpi__foot">
+        @if (inProgress() > 0) {
+          {{ inProgress() }} en cours de scoring
+        } @else {
+          Flux à jour
+        }
+        @if (trends()) {
+          <span class="kpi__vs">vs hier même heure</span>
+        }
+      </div>
+    </article>
 
-  <article class="kpi">
-    <div class="kpi__head">
-      <span class="kpi__label">Alertes du jour</span>
-      <span class="kpi__icon kpi__icon--red"><i class="pi pi-shield"></i></span>
-    </div>
-    <span class="kpi__value kpi__value--danger tabular">{{ data()?.alertsToday ?? '—' }}</span>
-    <div class="kpi__foot kpi__foot--danger">
-      Taux d'alerte : <strong class="tabular">{{ alertRate().toFixed(1).replace('.', ',') }} %</strong>
-    </div>
-  </article>
+    <article class="kpi">
+      <div class="kpi__head">
+        <span class="kpi__label">Alertes du jour</span>
+        <span class="kpi__icon kpi__icon--red"><i class="pi pi-shield" aria-hidden="true"></i></span>
+      </div>
+      <div class="kpi__row">
+        <span class="kpi__value kpi__value--danger tabular"><app-count-up [value]="data()?.alertsToday" /></span>
+        @if (trends()?.alerts; as t) {
+          <span class="trend" [class]="'trend--' + t.tone" [attr.title]="t.title">
+            <i [class]="t.icon" aria-hidden="true"></i>{{ t.text }}<span class="sr-only"> par rapport à hier. {{ t.title }}</span>
+          </span>
+        }
+      </div>
+      <app-sparkline tone="danger" [values]="sparks().flagged" label="Transactions suspectes par minute, 15 dernières minutes" />
+      <div class="kpi__foot kpi__foot--danger">
+        Taux d'alerte : <strong class="tabular">{{ alertRate().toFixed(1).replace('.', ',') }} %</strong>
+      </div>
+    </article>
 
-  <article class="kpi">
-    <div class="kpi__head">
-      <span class="kpi__label">Montant bloqué</span>
-      <span class="kpi__icon kpi__icon--green"><i class="pi pi-lock"></i></span>
-    </div>
-    <span class="kpi__value tabular">
-      {{ data()?.blockedAmountToday | dt: false }}<small>DT</small>
-    </span>
-    <div class="kpi__foot">{{ data()?.decisions?.BLOQUEE ?? 0 }} transaction(s) bloquée(s) aujourd'hui</div>
-  </article>
+    <article class="kpi">
+      <div class="kpi__head">
+        <span class="kpi__label">Montant bloqué</span>
+        <span class="kpi__icon kpi__icon--green"><i class="pi pi-lock" aria-hidden="true"></i></span>
+      </div>
+      <div class="kpi__row">
+        <span class="kpi__value tabular">
+          <app-count-up [value]="data()?.blockedAmountToday" [format]="formatAmount" /><small>DT</small>
+        </span>
+        @if (trends()?.blocked; as t) {
+          <span class="trend" [class]="'trend--' + t.tone" [attr.title]="t.title">
+            <i [class]="t.icon" aria-hidden="true"></i>{{ t.text }}<span class="sr-only"> par rapport à hier. {{ t.title }}</span>
+          </span>
+        }
+      </div>
+      <app-sparkline tone="success" [values]="sparks().blocked" label="Montant bloqué depuis l'ouverture de la page" />
+      <div class="kpi__foot">{{ data()?.decisions?.BLOQUEE ?? 0 }} transaction(s) bloquée(s) aujourd'hui</div>
+    </article>
 
-  <article class="kpi">
-    <div class="kpi__head">
-      <span class="kpi__label">Alertes à vérifier</span>
-      <span class="kpi__icon kpi__icon--amber"><i class="pi pi-hourglass"></i></span>
-    </div>
-    <span class="kpi__value tabular">{{ data()?.pendingReviewCount ?? '—' }}</span>
-    <div class="kpi__foot">
-      <a routerLink="/analyste/alertes" [queryParams]="{ status: 'A_VERIFIER' }">
-        Traiter les alertes <i class="pi pi-arrow-right" aria-hidden="true"></i>
-      </a>
-    </div>
-  </article>
+    <article class="kpi">
+      <div class="kpi__head">
+        <span class="kpi__label">Alertes à vérifier</span>
+        <span class="kpi__icon kpi__icon--amber"><i class="pi pi-hourglass" aria-hidden="true"></i></span>
+      </div>
+      <div class="kpi__row">
+        <span class="kpi__value tabular"><app-count-up [value]="data()?.pendingReviewCount" /></span>
+      </div>
+      <app-sparkline tone="warning" [values]="sparks().pending" label="Alertes en attente depuis l'ouverture de la page" />
+      <div class="kpi__foot">
+        <a routerLink="/analyste/alertes" [queryParams]="{ status: 'A_VERIFIER' }">
+          Traiter les alertes <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+    </article>
+  }
 </section>
 
 <!-- Graphiques -->
 <section class="charts">
   <article class="card">
     <header class="card__header">
-      <span class="card__icon"><i class="pi pi-chart-line"></i></span>
+      <span class="card__icon"><i class="pi pi-chart-line" aria-hidden="true"></i></span>
       <div>
         <h2>Transactions par minute</h2>
         <p>15 dernières minutes, mises à jour en direct</p>
       </div>
     </header>
     <div class="chart chart--line">
-      <p-chart type="line" [data]="lineData()" [options]="lineOptions" height="100%" />
+      @if (data()) {
+        <p-chart type="line" [data]="lineData()" [options]="lineOptions()" height="100%" />
+      } @else if (loading()) {
+        <span class="fs-skeleton fs-skeleton--block" aria-hidden="true"></span>
+      }
     </div>
   </article>
 
   <article class="card">
     <header class="card__header">
-      <span class="card__icon"><i class="pi pi-chart-pie"></i></span>
+      <span class="card__icon"><i class="pi pi-chart-pie" aria-hidden="true"></i></span>
       <div>
         <h2>Répartition des décisions</h2>
         <p>Transactions traitées aujourd'hui</p>
       </div>
     </header>
     <div class="chart chart--donut">
-      <p-chart type="doughnut" [data]="donutData()" [options]="donutOptions" height="100%" />
-      <div class="donut-center">
-        <span class="tabular">{{ decidedTotal() }}</span>
-        <small>décisions</small>
-      </div>
+      @if (data()) {
+        <p-chart type="doughnut" [data]="donutData()" [options]="donutOptions()" height="100%" />
+        <div class="donut-center">
+          <span class="tabular">{{ decidedTotal() }}</span>
+          <small>décisions</small>
+        </div>
+      } @else if (loading()) {
+        <span class="fs-skeleton fs-skeleton--circle donut-skeleton" aria-hidden="true"></span>
+      }
     </div>
     <ul class="legend">
       @for (row of decisionRows(); track row.key) {
@@ -118,43 +167,59 @@
       <h2>Alertes en temps réel @if (connected()) { <span class="pulse" aria-hidden="true"></span> }</h2>
       <p>Transactions suspectes signalées par le modèle et les règles métier</p>
     </div>
-    <a routerLink="/analyste/alertes" class="see-all">Toutes les alertes <i class="pi pi-chevron-right"></i></a>
+    <a routerLink="/analyste/alertes" class="see-all">Toutes les alertes <i class="pi pi-chevron-right" aria-hidden="true"></i></a>
   </header>
 
-  <div class="table-wrap">
+  <div class="chips" role="group" aria-label="Filtrer les alertes">
+    @for (f of filters; track f.value) {
+      <button type="button" class="chip" [class.chip--on]="filter() === f.value" [attr.aria-pressed]="filter() === f.value" (click)="setFilter(f.value)">
+        {{ f.label }}
+      </button>
+    }
+  </div>
+
+  <div class="table-wrap fs-stack-table" [attr.aria-busy]="alertsLoading()">
     <table class="alerts">
       <thead>
         <tr>
-          <th>Heure</th>
-          <th>Client</th>
-          <th>Compte</th>
-          <th class="num">Montant</th>
-          <th>Pays</th>
-          <th>Score</th>
-          <th>Statut</th>
-          <th class="actions">Actions</th>
+          <th scope="col">Heure</th>
+          <th scope="col">Client</th>
+          <th scope="col">Compte</th>
+          <th scope="col" class="num">Montant</th>
+          <th scope="col">Pays</th>
+          <th scope="col">Score</th>
+          <th scope="col">Statut</th>
+          <th scope="col" class="actions"><span class="sr-only">Actions</span></th>
         </tr>
       </thead>
       <tbody>
         @for (alert of alerts(); track alert.id) {
-          <tr [class.row--new]="fresh().has(alert.id)">
-            <td class="tabular">{{ alert.createdAt | date: 'HH:mm:ss' }}</td>
-            <td class="client">{{ alert.clientName }}</td>
-            <td class="mono">{{ alert.accountRef }}</td>
-            <td class="num tabular nowrap">{{ alert.amount | dt: false }} <span class="unit">DT</span></td>
-            <td><span class="country"><app-flag [code]="alert.country" />{{ alert.country }}</span></td>
-            <td class="score"><app-score-bar [score]="alert.score" /></td>
-            <td><app-alert-badge [decision]="alert.decision" [analystDecision]="alert.analystDecision" /></td>
+          <tr [class]="rowTone(alert)" [class.row--new]="fresh().has(alert.id)">
+            <td data-label="Heure" class="tabular">{{ alert.createdAt | date: 'HH:mm:ss' }}</td>
+            <td data-label="Client" class="client">{{ alert.clientName }}</td>
+            <td data-label="Compte" class="mono">{{ alert.accountRef }}</td>
+            <td data-label="Montant" class="num tabular nowrap">{{ alert.amount | dt: false }} <span class="unit">DT</span></td>
+            <td data-label="Pays"><span class="country"><app-flag [code]="alert.country" />{{ alert.country }}</span></td>
+            <td data-label="Score" class="score"><app-score-bar [score]="alert.score" /></td>
+            <td data-label="Statut"><app-alert-badge [decision]="alert.decision" [analystDecision]="alert.analystDecision" /></td>
             <td class="actions">
-              <a class="details" [routerLink]="['/analyste/alertes', alert.id]">Détails</a>
+              <a class="details" [routerLink]="['/analyste/alertes', alert.id]" [attr.aria-label]="'Détails de l’alerte ' + alert.id">Détails</a>
             </td>
           </tr>
         } @empty {
-          <tr>
-            <td colspan="8" class="empty">
-              {{ loading() ? 'Chargement…' : 'Aucune alerte pour le moment.' }}
-            </td>
-          </tr>
+          @if (alertsLoading()) {
+            @for (i of skeletonRows; track i) {
+              <tr class="skeleton-row" aria-hidden="true">
+                <td colspan="8" class="fs-stack-full"><span class="fs-skeleton"></span></td>
+              </tr>
+            }
+          } @else {
+            <tr>
+              <td colspan="8" class="fs-stack-full">
+                <app-empty-state icon="pi pi-check" [title]="emptyTitle()" message="Les nouvelles alertes s'afficheront ici en temps réel." />
+              </td>
+            </tr>
+          }
         }
       </tbody>
     </table>

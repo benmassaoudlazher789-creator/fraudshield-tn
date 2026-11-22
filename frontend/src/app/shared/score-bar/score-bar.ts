@@ -33,7 +33,7 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       flex: 1;
       height: 6px;
       border-radius: 9999px;
-      background: var(--fs-border);
+      background: var(--fs-surface-high);
       overflow: hidden;
     }
     .fill {
@@ -41,12 +41,12 @@ import { ChangeDetectionStrategy, Component, computed, input } from '@angular/co
       height: 100%;
       border-radius: 9999px;
     }
-    .low { color: #047857; }
-    .medium { color: #b45309; }
-    .high { color: #b91c1c; }
-    .fill.low { background: var(--fs-success); }
-    .fill.medium { background: var(--fs-warning); }
-    .fill.high { background: var(--fs-danger); }
+    .low { color: var(--fs-success-strong); }
+    .medium { color: var(--fs-warning-strong); }
+    .high { color: var(--fs-danger-strong); }
+    .fill.low { background: var(--fs-chart-success); }
+    .fill.medium { background: var(--fs-chart-warning); }
+    .fill.high { background: var(--fs-chart-danger); }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

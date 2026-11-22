@@ -17,6 +17,7 @@ import { AdminUser } from '../../../core/models/admin.model';
 import { ROLE_LABELS, Role } from '../../../core/models/user.model';
 import { AdminService } from '../../../core/services/admin.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { AdminTabs } from '../admin-tabs/admin-tabs';
 
 type DialogMode = 'create' | 'edit';
@@ -42,6 +43,7 @@ const ROLE_BADGE: Record<Role, string> = {
     SelectModule,
     TableModule,
     AdminTabs,
+    EmptyState,
   ],
   templateUrl: './users.html',
   styleUrl: './users.scss',

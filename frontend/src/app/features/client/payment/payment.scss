@@ -38,8 +38,8 @@
     width: 40px;
     height: 40px;
     border-radius: var(--fs-radius);
-    background: var(--fs-surface-high);
-    color: var(--fs-primary);
+    background: var(--fs-primary-soft);
+    color: var(--fs-brand-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,7 +139,7 @@
     line-height: 38px;
     font-weight: 700;
     letter-spacing: -0.03em;
-    color: var(--fs-primary-dark);
+    color: var(--fs-brand-strong);
   }
 
   &__currency {
@@ -270,11 +270,11 @@ form {
   transition: background-color 0.15s;
 
   &:hover {
-    background: #dae2fd;
+    background: var(--fs-hover-soft);
   }
 
   &:focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid var(--fs-focus);
     outline-offset: 2px;
   }
 }
@@ -284,6 +284,7 @@ form {
   padding: 0.75rem 1.5rem;
   background: var(--fs-primary-dark);
   border-color: var(--fs-primary-dark);
+  color: #fff;
   font-size: 16px;
   font-weight: 600;
 }
@@ -339,23 +340,23 @@ form {
 
   &--pending,
   &--timeout {
-    background: #eef2fb;
-    color: var(--fs-primary-dark);
-    .banner__icon { background: #dce4f6; }
+    background: var(--fs-info-bg);
+    color: var(--fs-brand-strong);
+    .banner__icon { background: var(--fs-primary-soft); }
   }
 
   &--success {
-    background: rgba(0, 74, 49, 0.1);
-    color: #004a31;
-    .banner__icon { background: rgba(78, 222, 163, 0.3); }
+    background: var(--fs-success-bg);
+    color: var(--fs-success-text);
+    .banner__icon { background: color-mix(in srgb, var(--fs-success) 25%, transparent); }
   }
 
   &--blocked,
   &--error {
-    background: rgba(255, 218, 214, 0.4);
-    color: #ba1a1a;
-    .banner__icon { background: #ffdad6; }
-    p { color: #93000a; }
+    background: var(--fs-danger-bg);
+    color: var(--fs-danger-strong);
+    .banner__icon { background: var(--fs-danger-soft); }
+    p { color: var(--fs-danger-text); }
   }
 }
 
@@ -368,7 +369,7 @@ form {
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  color: var(--fs-primary-dark);
+  color: var(--fs-brand-strong);
   text-decoration: none;
 
   .pi {
@@ -395,6 +396,10 @@ form {
 
   &:last-child {
     border-bottom: 0;
+  }
+
+  &--skeleton {
+    min-height: 64px;
   }
 
   &__flag {
@@ -437,11 +442,6 @@ form {
   }
 }
 
-.empty {
-  padding: 1.5rem 0;
-  text-align: center;
-  color: var(--fs-text-muted);
-}
 
 /* ---------- Responsive ---------- */
 @media (max-width: 1279px) {

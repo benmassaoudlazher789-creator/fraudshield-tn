@@ -1,0 +1,89 @@
+<button
+  type="button"
+  class="bell"
+  [class.bell--active]="unread() > 0"
+  (click)="popover.toggle($event)"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="open()"
+  aria-controls="notifications-panel"
+  [attr.aria-label]="buttonLabel()"
+  [attr.title]="buttonLabel()"
+>
+  <i class="pi pi-bell" aria-hidden="true"></i>
+  @if (unread() > 0) {
+    <span class="bell__count tabular" aria-hidden="true">{{ badgeText() }}</span>
+  }
+</button>
+
+<p-popover
+  #popover
+  styleClass="notif-popover"
+  ariaLabel="Alertes récentes"
+  (onShow)="onShow()"
+  (onHide)="onHide()"
+>
+  <div class="panel" id="notifications-panel">
+    <header class="panel__head">
+      <strong>Alertes récentes</strong>
+      <span class="panel__hint">Reçues en temps réel depuis votre connexion</span>
+    </header>
+
+    @if (recent().length) {
+      <ul class="panel__list">
+        @for (alert of recent(); track alert.id; let i = $index) {
+          <li>
+            <a
+              class="item"
+              [class.item--unread]="i < highlighted()"
+              [class.item--blocked]="alert.decision === 'BLOQUEE'"
+              [routerLink]="['/analyste/alertes', alert.id]"
+              (click)="close(popover)"
+            >
+              <span class="item__main">
+                <span class="item__title">
+                  #{{ alert.id }} · {{ alert.clientName }}
+                  @if (i < highlighted()) {
+                    <span class="sr-only">(nouvelle)</span>
+                  }
+                </span>
+                <span class="item__meta tabular">
+                  {{ alert.createdAt | date: 'HH:mm:ss' }} · {{ alert.amount | dt }} · {{ alert.score }}/100
+                </span>
+              </span>
+              <app-alert-badge [decision]="alert.decision" [analystDecision]="alert.analystDecision" />
+            </a>
+          </li>
+        }
+      </ul>
+    } @else {
+      <app-empty-state
+        [compact]="true"
+        icon="pi pi-bell"
+        title="Aucune nouvelle alerte"
+        message="Les alertes signalées par le moteur apparaîtront ici en direct."
+      />
+    }
+
+    <footer class="panel__foot">
+      <a routerLink="/analyste/alertes" (click)="close(popover)">
+        Voir toutes les alertes <i class="pi pi-arrow-right" aria-hidden="true"></i>
+      </a>
+    </footer>
+  </div>
+</p-popover>
+
+<!-- Toasts des alertes bloquées : en bas à droite, hors de la zone de travail principale -->
+<p-toast [key]="toastKey" position="bottom-right" styleClass="alert-toast" [breakpoints]="{ '767px': { width: 'calc(100vw - 2rem)', right: '1rem', left: '1rem' } }">
+  <ng-template #message let-message>
+    <div class="toast">
+      <span class="toast__icon"><i class="pi pi-ban" aria-hidden="true"></i></span>
+      <div class="toast__body">
+        <strong>{{ message.summary }}</strong>
+        <span>{{ message.detail }}</span>
+        <button type="button" class="toast__link" (click)="openToast(message.data)">
+          Voir <i class="pi pi-arrow-right" aria-hidden="true"></i>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

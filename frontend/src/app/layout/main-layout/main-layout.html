@@ -1,11 +1,21 @@
 <div class="shell" [class.shell--menu-open]="menuOpen()">
-  <aside class="sidebar" id="sidebar">
+  <aside
+    class="sidebar"
+    id="sidebar"
+    #sidebar
+    aria-label="Menu"
+    [attr.inert]="compact() && !menuOpen() ? '' : null"
+    (keydown.escape)="closeMenu(true)"
+  >
     <div class="sidebar__brand">
-      <div class="sidebar__logo"><i class="pi pi-shield"></i></div>
+      <div class="sidebar__logo"><i class="pi pi-shield" aria-hidden="true"></i></div>
       <div class="sidebar__brand-text">
         <span class="sidebar__name">FraudShield TN</span>
         <span class="sidebar__tagline">Plateforme de détection</span>
       </div>
+      <button type="button" class="sidebar__close" (click)="closeMenu(true)" aria-label="Fermer le menu">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
     </div>
 
     <nav class="sidebar__nav" aria-label="Navigation principale">
@@ -29,22 +39,45 @@
   </aside>
 
   <!-- Voile cliquable derrière le menu mobile -->
-  <div class="backdrop" (click)="menuOpen.set(false)" aria-hidden="true"></div>
+  <div class="backdrop" (click)="closeMenu()" aria-hidden="true"></div>
 
   <div class="main">
     <header class="topbar">
       <button
+        #burger
         type="button"
-        class="topbar__burger"
+        class="icon-button topbar__burger"
         (click)="toggleMenu()"
         aria-controls="sidebar"
         [attr.aria-expanded]="menuOpen()"
         aria-label="Ouvrir le menu"
       >
-        <i class="pi pi-bars"></i>
+        <i class="pi pi-bars" aria-hidden="true"></i>
       </button>
 
       <div class="topbar__spacer"></div>
+
+      @if (isStaff()) {
+        @if (realtimeIssue(); as issue) {
+          <span class="ws-status" [class.ws-status--down]="issue.down" role="status" [attr.title]="issue.label">
+            <i [class]="issue.down ? 'pi pi-wifi' : 'pi pi-spin pi-spinner'" aria-hidden="true"></i>
+            <span class="ws-status__text">{{ issue.label }}</span>
+          </span>
+        }
+        <app-notification-bell />
+      }
+
+      <button
+        type="button"
+        class="icon-button"
+        (click)="theme.toggle()"
+        [attr.aria-label]="theme.isDark() ? 'Activer le thème clair' : 'Activer le thème sombre'"
+        [attr.title]="theme.isDark() ? 'Thème clair' : 'Thème sombre'"
+      >
+        <i [class]="theme.isDark() ? 'pi pi-sun' : 'pi pi-moon'" aria-hidden="true"></i>
+      </button>
+
+      <div class="topbar__divider"></div>
 
       @if (user(); as u) {
         <div class="user">
@@ -56,10 +89,10 @@
         </div>
       }
 
-      <div class="topbar__divider"></div>
-
       <p-button
+        styleClass="logout"
         label="Déconnexion"
+        ariaLabel="Déconnexion"
         icon="pi pi-sign-out"
         severity="secondary"
         [outlined]="true"
@@ -68,7 +101,7 @@
       />
     </header>
 
-    <main class="content">
+    <main class="content fs-content" id="contenu">
       <router-outlet />
     </main>
   </div>

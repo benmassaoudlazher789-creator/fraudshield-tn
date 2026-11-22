@@ -9,6 +9,17 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Thème appliqué avant le rendu (évite un flash clair) ; ThemeService prend ensuite le relais -->
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem('fs_theme'); } catch (e) { /* stockage indisponible */ }
+      if (theme !== 'light' && theme !== 'dark') {
+        theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      if (theme === 'dark') { document.documentElement.classList.add('fs-dark'); }
+    })();
+  </script>
 </head>
 <body>
   <app-root></app-root>

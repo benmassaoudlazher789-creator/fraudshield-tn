@@ -34,7 +34,7 @@ import { countryName } from '../../core/models/client.model';
     img {
       display: block;
       border-radius: 2px;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+      box-shadow: 0 0 0 1px var(--fs-border);
     }
     .fallback {
       font-size: 11px;

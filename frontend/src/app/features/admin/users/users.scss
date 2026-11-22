@@ -17,7 +17,7 @@
     line-height: 36px;
     font-weight: 700;
     letter-spacing: -0.02em;
-    color: var(--fs-primary-dark);
+    color: var(--fs-brand-strong);
   }
 
   p {
@@ -86,8 +86,8 @@
   min-width: 880px;
 
   th {
-    background: #f8fafc;
-    color: #64748b;
+    background: var(--fs-table-head);
+    color: var(--fs-table-head-text);
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.05em;
@@ -97,6 +97,21 @@
 
   td {
     height: 60px;
+  }
+
+  tbody > tr:hover > td {
+    background: var(--fs-row-hover);
+  }
+
+  .skeleton-cell {
+    height: 60px;
+  }
+
+  /* En carte : nom et avatar en en-tête de carte */
+  @media (max-width: 767px) {
+    .person-cell {
+      padding-bottom: 0.625rem;
+    }
   }
 }
 
@@ -131,8 +146,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #dce1ff;
-  color: var(--fs-primary-dark);
+  background: var(--fs-primary-soft);
+  color: var(--fs-brand-strong);
   font-size: 13px;
   font-weight: 700;
 
@@ -155,13 +170,13 @@
   white-space: nowrap;
 
   &--client {
-    background: #dae2fd;
-    color: #3f465c;
+    background: var(--fs-info-bg);
+    color: var(--fs-info-text);
   }
 
   &--analyst {
-    background: #dce1ff;
-    color: var(--fs-primary);
+    background: var(--fs-primary-soft);
+    color: var(--fs-brand-text);
   }
 
   &--admin {
@@ -188,8 +203,9 @@
   padding: 0.25rem 0.5rem;
   font: inherit;
   font-weight: 600;
-  color: var(--fs-primary-dark);
+  color: var(--fs-brand-strong);
   cursor: pointer;
+  transition: background-color 0.15s;
   border-radius: var(--fs-radius);
 
   &:hover:not(:disabled) {
@@ -202,19 +218,14 @@
   }
 
   &--danger {
-    color: #ba1a1a;
+    color: var(--fs-danger-strong);
   }
 
   &--success {
-    color: #047857;
+    color: var(--fs-success-strong);
   }
 }
 
-.empty {
-  padding: 2rem 0;
-  text-align: center;
-  color: var(--fs-text-muted);
-}
 
 /* ---------- Modale ---------- */
 .form {
@@ -249,7 +260,7 @@
   }
 
   &__error {
-    color: #b91c1c;
+    color: var(--fs-danger-strong);
   }
 
   &__hint {
@@ -272,8 +283,12 @@
   line-height: 22px;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767px) {
   .card {
     padding: 1rem;
+  }
+
+  .table-wrap {
+    margin: 0 -1rem;
   }
 }

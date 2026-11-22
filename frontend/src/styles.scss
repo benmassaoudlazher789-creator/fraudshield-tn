@@ -1,13 +1,26 @@
 /* Styles globaux FraudShield TN (design system "Sovereign Sentinel" des maquettes) */
 
+/* ---------- Tokens : thème clair ---------- */
 :root {
-  /* Marque */
+  color-scheme: light;
+
+  /* Marque (fonds) */
   --fs-primary: #1e3a8a;
   --fs-primary-dark: #00236f;
   --fs-primary-darker: #00164e;
+  --fs-primary-soft: #dce1ff;
   --fs-on-primary-muted: #b6c4ff;
   --fs-on-primary-soft: #90a8ff;
   --fs-accent: #6ffbbe;
+  /* Marque (texte et icônes sur surface) */
+  --fs-brand-text: #1e3a8a;
+  --fs-brand-strong: #00236f;
+  --fs-hover-soft: #dae2fd;
+
+  /* Sidebar */
+  --fs-sidebar-bg: #00236f;
+  --fs-sidebar-brand: #1e3a8a;
+  --fs-sidebar-active: #1e3a8a;
 
   /* Surfaces */
   --fs-bg: #f7f9fb;
@@ -15,26 +28,128 @@
   --fs-surface-low: #f2f4f6;
   --fs-surface-high: #e6e8ea;
   --fs-border: #e2e8f0;
+  --fs-topbar-bg: #f7f9fb;
+  --fs-overlay: rgba(15, 23, 42, 0.45);
 
   /* Texte */
   --fs-text: #191c1e;
   --fs-text-muted: #565e74;
-  --fs-text-subtle: #757682;
+  --fs-text-subtle: #6b6c78;
 
-  /* Statuts */
+  /* Statuts : point / fond / texte de badge / texte fort sur surface */
   --fs-success: #10b981;
   --fs-success-bg: #ecfdf5;
   --fs-success-text: #065f46;
+  --fs-success-strong: #047857;
   --fs-warning: #f59e0b;
   --fs-warning-bg: #fffbeb;
   --fs-warning-text: #92400e;
+  --fs-warning-strong: #b45309;
   --fs-danger: #ef4444;
   --fs-danger-bg: #fef2f2;
+  --fs-danger-soft: #fee2e2;
   --fs-danger-text: #991b1b;
+  --fs-danger-strong: #b91c1c;
+  --fs-info-bg: #dae2fd;
+  --fs-info-text: #3f465c;
+  --fs-info: #5c647a;
+
+  /* Tableaux */
+  --fs-table-head: #f8fafc;
+  --fs-table-head-text: #64748b;
+  --fs-row-border: #f1f5f9;
+  --fs-row-hover: #f8fafc;
+
+  /* Graphiques (contraste >= 3:1 sur la carte) */
+  --fs-chart-primary: #1e3a8a;
+  --fs-chart-primary-fill: rgba(30, 58, 138, 0.1);
+  --fs-chart-danger: #dc2626;
+  --fs-chart-success: #059669;
+  --fs-chart-warning: #d97706;
+  --fs-chart-soft: #6f87cc;
+  --fs-chart-neutral: #565e74;
+  --fs-chart-neutral-2: #7c8397;
+  --fs-chart-grid: #eef2f7;
+  --fs-chart-text: #64748b;
+
+  --fs-focus: #2563eb;
+  --fs-skeleton: #e8ecf2;
+  --fs-skeleton-hi: #f5f7fa;
 
   --fs-radius: 0.5rem;
   --fs-radius-lg: 0.75rem;
   --fs-shadow-card: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.02);
+  --fs-shadow-pop: 0 12px 32px -8px rgba(15, 23, 42, 0.18);
+  --fs-topbar-height: 64px;
+}
+
+/* ---------- Tokens : thème sombre (classe posée sur <html> par ThemeService) ---------- */
+:root.fs-dark {
+  color-scheme: dark;
+
+  --fs-primary: #3b5bb5;
+  --fs-primary-dark: #1a2c63;
+  --fs-primary-darker: #101c42;
+  --fs-primary-soft: #1f2c55;
+  --fs-brand-text: #b6c4ff;
+  --fs-brand-strong: #c9d4ff;
+  --fs-hover-soft: #2a3a66;
+
+  --fs-sidebar-bg: #0c1530;
+  --fs-sidebar-brand: #13204a;
+  --fs-sidebar-active: #22357a;
+
+  --fs-bg: #0b1120;
+  --fs-surface: #131b2e;
+  --fs-surface-low: #1a2338;
+  --fs-surface-high: #243049;
+  --fs-border: #2a3650;
+  --fs-topbar-bg: #0b1120;
+  --fs-overlay: rgba(2, 6, 23, 0.65);
+
+  --fs-text: #e6eaf3;
+  --fs-text-muted: #a7b0c4;
+  --fs-text-subtle: #8d97ab;
+
+  --fs-success: #34d399;
+  --fs-success-bg: #0f2b25;
+  --fs-success-text: #6ee7b7;
+  --fs-success-strong: #6ee7b7;
+  --fs-warning: #fbbf24;
+  --fs-warning-bg: #2e240f;
+  --fs-warning-text: #fcd34d;
+  --fs-warning-strong: #fcd34d;
+  --fs-danger: #f87171;
+  --fs-danger-bg: #34171b;
+  --fs-danger-soft: #4a1d22;
+  --fs-danger-text: #fca5a5;
+  --fs-danger-strong: #fca5a5;
+  --fs-info-bg: #1f2a48;
+  --fs-info-text: #c7d2fe;
+  --fs-info: #93a4d6;
+
+  --fs-table-head: #172036;
+  --fs-table-head-text: #a7b0c4;
+  --fs-row-border: #222c42;
+  --fs-row-hover: #18213a;
+
+  --fs-chart-primary: #8aa3dc;
+  --fs-chart-primary-fill: rgba(138, 163, 220, 0.14);
+  --fs-chart-danger: #f87171;
+  --fs-chart-success: #34d399;
+  --fs-chart-warning: #fbbf24;
+  --fs-chart-soft: #c7d3ff;
+  --fs-chart-neutral: #a7b0c4;
+  --fs-chart-neutral-2: #7f8aa3;
+  --fs-chart-grid: #222c42;
+  --fs-chart-text: #a7b0c4;
+
+  --fs-focus: #7aa2ff;
+  --fs-skeleton: #1d2740;
+  --fs-skeleton-hi: #283451;
+
+  --fs-shadow-card: 0 0 0 1px #212c45, 0 1px 2px rgba(0, 0, 0, 0.35);
+  --fs-shadow-pop: 0 0 0 1px #2a3650, 0 16px 40px -8px rgba(0, 0, 0, 0.6);
 }
 
 *,
@@ -50,6 +165,11 @@ body {
   min-height: 100%;
 }
 
+/* Ancres et focus clavier jamais masqués par l'en-tête sticky */
+html {
+  scroll-padding-top: calc(var(--fs-topbar-height) + 1rem);
+}
+
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-size: 14px;
@@ -60,10 +180,28 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Focus clavier visible partout (les composants PrimeNG ont leur propre anneau) */
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--fs-focus);
+  outline-offset: 2px;
+}
+
 /* Chiffres tabulaires pour les montants, scores et heures */
 .tabular {
   font-feature-settings: 'tnum' 1;
   font-variant-numeric: tabular-nums;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* Carte blanche arrondie */
@@ -117,8 +255,129 @@ body {
 
   /* En cours d'analyse : bleu neutre */
   &--info {
-    background: #dae2fd;
-    color: #3f465c;
-    &::before { background: #5c647a; }
+    background: var(--fs-info-bg);
+    color: var(--fs-info-text);
+    &::before { background: var(--fs-info); }
+  }
+}
+
+/* ---------- Skeletons (chargement initial) ---------- */
+.fs-skeleton {
+  display: block;
+  height: 0.875rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(90deg, var(--fs-skeleton) 25%, var(--fs-skeleton-hi) 50%, var(--fs-skeleton) 75%)
+    0 0 / 200% 100%;
+  animation: fs-shimmer 1.4s ease-in-out infinite;
+
+  &--title { height: 1.5rem; width: 40%; }
+  &--value { height: 2.25rem; width: 55%; }
+  &--block { height: 100%; min-height: 8rem; border-radius: var(--fs-radius); }
+  &--circle { border-radius: 50%; }
+}
+
+@keyframes fs-shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* ---------- Tableaux affichés en cartes sous 768 px ----------
+   Sur <table> natif ou p-table (styleClass) : chaque <td data-label="…"> devient une ligne libellé / valeur. */
+@media (max-width: 767px) {
+  .fs-stack-table {
+    table {
+      min-width: 0 !important;
+    }
+
+    table,
+    &:is(table) {
+      display: block;
+      width: 100%;
+    }
+
+    thead {
+      display: none;
+    }
+
+    tbody {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+
+    tbody > tr {
+      display: block;
+      padding: 0.5rem 0.875rem;
+      border: 1px solid var(--fs-border);
+      border-radius: var(--fs-radius-lg);
+      background: var(--fs-surface);
+    }
+
+    tbody > tr > td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      height: auto;
+      min-height: 2.5rem;
+      padding: 0.375rem 0;
+      border: 0;
+      border-bottom: 1px solid var(--fs-row-border);
+      text-align: right;
+
+      &:last-child {
+        border-bottom: 0;
+      }
+
+      /* Cellule d'actions (sans libellé) : bouton aligné à droite */
+      &:not([data-label]) {
+        justify-content: flex-end;
+      }
+
+      &[data-label]::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        color: var(--fs-table-head-text);
+        font: 600 11px/16px 'Inter', sans-serif;
+        letter-spacing: 0.05em;
+        text-align: left;
+        text-transform: uppercase;
+      }
+
+      /* Lignes de chargement et état vide : pleine largeur */
+      &.fs-stack-full {
+        display: block;
+        text-align: initial;
+      }
+    }
+  }
+}
+
+/* ---------- Transition douce entre les pages ---------- */
+.fs-content > router-outlet + * {
+  animation: fs-page-in 0.24s ease-out backwards;
+}
+
+@keyframes fs-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ---------- Animations désactivées si l'utilisateur le demande ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .fs-skeleton {
+    animation: none;
   }
 }

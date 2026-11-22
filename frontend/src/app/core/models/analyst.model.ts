@@ -93,6 +93,8 @@ export interface Dashboard {
   pendingReviewCount: number;
   decisions: Record<'ACCEPTEE' | 'A_VERIFIER' | 'BLOQUEE', number>;
   perMinute: MinuteBucket[];
+  /** Veille, de 0 h à la même heure (absent sur un backend plus ancien). */
+  yesterday?: { transactions: number; alerts: number; blockedAmount: number };
   generatedAt: string;
 }
 

@@ -41,6 +41,16 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     @Query("select coalesce(sum(t.amount), 0) from Transaction t where t.status = :status and t.createdAt >= :from")
     BigDecimal sumAmountByStatusSince(@Param("status") TransactionStatus status, @Param("from") LocalDateTime from);
 
+    /** Tableau de bord (tendance vs la veille) : nombre de transactions créées dans [from, to[. */
+    long countByCreatedAtGreaterThanEqualAndCreatedAtLessThan(LocalDateTime from, LocalDateTime to);
+
+    /** Tableau de bord (tendance vs la veille) : somme des montants d'un statut dans [from, to[. */
+    @Query("""
+            select coalesce(sum(t.amount), 0) from Transaction t
+            where t.status = :status and t.createdAt >= :from and t.createdAt < :to""")
+    BigDecimal sumAmountByStatusBetween(@Param("status") TransactionStatus status,
+                                        @Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
+
     /** Graphique par minute : date de création et statut des transactions récentes. */
     @Query("select t.createdAt, t.status from Transaction t where t.createdAt >= :from")
     List<Object[]> findCreatedAtAndStatusSince(@Param("from") LocalDateTime from);

@@ -10,22 +10,11 @@ import { Statistics as StatisticsData, StatisticsDays } from '../../../core/mode
 import { TransactionType, countryName } from '../../../core/models/client.model';
 import { DtPipe } from '../../../core/pipes/dt.pipe';
 import { AnalystService } from '../../../core/services/analyst.service';
+import { prefersReducedMotion, readChartColors } from '../../../core/theme/chart-colors';
+import { ThemeService } from '../../../core/theme/theme.service';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { Flag } from '../../../shared/flag/flag';
-
-const COLORS = {
-  primary: '#1e3a8a',
-  primaryFill: 'rgba(30, 58, 138, 0.10)',
-  danger: '#ba1a1a',
-  dangerSoft: '#d94b4b',
-  confirmed: '#1e3a8a',
-  falsePositive: '#b6c4ff',
-  grid: '#eef2f7',
-  text: '#64748b',
-};
-
-/** Barres du top pays : du rouge (1er) au gris (5e), comme la maquette. */
-const COUNTRY_COLORS = ['#ba1a1a', '#d94b4b', '#1e3a8a', '#565e74', '#8a91a5'];
 
 const TYPE_VIEW: Record<TransactionType, { label: string; icon: string }> = {
   PAYMENT: { label: 'Paiements', icon: 'pi pi-credit-card' },
@@ -65,7 +54,7 @@ function splitDuration(seconds: number): { main: string; mainUnit: string; rest:
 /** Page /analyste/statistiques : tendances des fraudes et performance du modèle. */
 @Component({
   selector: 'app-statistics',
-  imports: [FormsModule, ChartModule, SelectButtonModule, DtPipe, Flag],
+  imports: [FormsModule, ChartModule, SelectButtonModule, DtPipe, EmptyState, Flag],
   templateUrl: './statistics.html',
   styleUrl: './statistics.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,6 +62,13 @@ function splitDuration(seconds: number): { main: string; mainUnit: string; rest:
 export class Statistics {
   private readonly analystService = inject(AnalystService);
   private readonly days$ = new Subject<StatisticsDays>();
+  private readonly theme = inject(ThemeService);
+
+  /** Couleurs des graphiques, relues à chaque changement de thème. */
+  private readonly colors = computed(() => {
+    this.theme.theme();
+    return readChartColors();
+  });
 
   protected readonly periodOptions: { label: string; value: StatisticsDays }[] = [
     { label: '7 jours', value: 7 },
@@ -125,25 +121,27 @@ export class Statistics {
 
   protected readonly lineData = computed<ChartData<'line'>>(() => {
     const days = this.stats()?.fraudsPerDay ?? [];
+    const c = this.colors();
     return {
       labels: days.map((d) => dayFormat.format(parseDay(d.date)).replace('.', '')),
       datasets: [
         {
           label: 'Fraudes détectées',
           data: days.map((d) => d.total),
-          borderColor: COLORS.primary,
-          backgroundColor: COLORS.primaryFill,
+          borderColor: c.primary,
+          backgroundColor: c.primaryFill,
           fill: true,
           tension: 0.35,
           pointRadius: 3,
-          pointBackgroundColor: '#fff',
+          pointBackgroundColor: c.surface,
           pointBorderWidth: 2,
         },
         {
           label: 'Dont bloquées',
           data: days.map((d) => d.blocked),
-          borderColor: COLORS.danger,
+          borderColor: c.danger,
           backgroundColor: 'transparent',
+          pointBackgroundColor: c.danger,
           borderDash: [5, 4],
           tension: 0.35,
           pointRadius: 2,
@@ -152,16 +150,19 @@ export class Statistics {
     };
   });
 
-  protected readonly lineOptions: ChartOptions<'line'> = {
-    maintainAspectRatio: false,
-    animation: { duration: 300 },
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { display: false } },
-    scales: {
-      x: { grid: { display: false }, ticks: { color: COLORS.text, maxRotation: 0, autoSkip: true } },
-      y: { beginAtZero: true, grid: { color: COLORS.grid }, ticks: { color: COLORS.text, precision: 0 } },
-    },
-  };
+  protected readonly lineOptions = computed<ChartOptions<'line'>>(() => {
+    const c = this.colors();
+    return {
+      maintainAspectRatio: false,
+      animation: prefersReducedMotion() ? false : { duration: 300 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, border: { color: c.grid }, ticks: { color: c.text, maxRotation: 0, autoSkip: true } },
+        y: { beginAtZero: true, grid: { color: c.grid }, border: { display: false }, ticks: { color: c.text, precision: 0 } },
+      },
+    };
+  });
 
   // ---------- Par type ----------
   protected readonly typeRows = computed(() => {
@@ -188,12 +189,15 @@ export class Statistics {
   // ---------- Top pays ----------
   protected readonly countryRows = computed(() => {
     const countries = this.stats()?.topCountries ?? [];
+    const c = this.colors();
+    // Du rouge (1er) au gris (5e), comme la maquette
+    const palette = [c.danger, c.warning, c.primary, c.neutral, c.neutral2];
     const max = Math.max(1, ...countries.map((c) => c.count));
     return countries.map((c, i) => ({
       ...c,
       name: countryName(c.country),
       width: (c.count / max) * 100,
-      color: COUNTRY_COLORS[i] ?? COUNTRY_COLORS[COUNTRY_COLORS.length - 1],
+      color: palette[Math.min(i, palette.length - 1)],
     }));
   });
 
@@ -242,24 +246,27 @@ export class Statistics {
   // ---------- Décisions des analystes ----------
   protected readonly donutData = computed<ChartData<'doughnut'>>(() => {
     const d = this.decisions();
+    const c = this.colors();
     const empty = d.total === 0;
     return {
       labels: ['Fraudes confirmées', 'Faux positifs'],
       datasets: [
         {
           data: empty ? [0, 1] : [d.confirmed, d.falsePositive],
-          backgroundColor: empty ? [COLORS.grid, COLORS.grid] : [COLORS.confirmed, COLORS.falsePositive],
-          borderWidth: 0,
+          backgroundColor: empty ? [c.grid, c.grid] : [c.primary, c.soft],
+          borderColor: c.surface,
+          borderWidth: empty ? 0 : 2,
         },
       ],
     };
   });
 
-  protected readonly donutOptions: ChartOptions<'doughnut'> = {
+  protected readonly donutOptions = computed<ChartOptions<'doughnut'>>(() => ({
     maintainAspectRatio: false,
+    animation: prefersReducedMotion() ? false : undefined,
     cutout: '74%',
-    plugins: { legend: { display: false }, tooltip: { enabled: true } },
-  };
+    plugins: { legend: { display: false }, tooltip: { enabled: this.decisions().total > 0 } },
+  }));
 
   constructor() {
     this.days$

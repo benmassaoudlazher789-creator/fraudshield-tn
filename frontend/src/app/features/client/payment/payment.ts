@@ -31,6 +31,7 @@ import { ShortDatePipe } from '../../../core/pipes/short-date.pipe';
 import { ClientService } from '../../../core/services/client.service';
 import { maskAccountRef } from '../../../core/utils/account-ref';
 import { apiErrorMessage } from '../../../core/utils/api-error';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { Flag } from '../../../shared/flag/flag';
 import { StatusBadge } from '../../../shared/status-badge/status-badge';
 
@@ -60,6 +61,7 @@ interface Banner {
     DtPipe,
     ShortDatePipe,
     StatusBadge,
+    EmptyState,
     Flag,
   ],
   templateUrl: './payment.html',

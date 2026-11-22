@@ -29,8 +29,8 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       theme: {
         preset: FraudShieldPreset,
-        // Les maquettes n'ont qu'un thème clair
-        options: { darkModeSelector: 'none' },
+        // Thème sombre piloté par ThemeService (classe .fs-dark sur <html>)
+        options: { darkModeSelector: '.fs-dark' },
       },
       translation: {
         accept: 'Oui',

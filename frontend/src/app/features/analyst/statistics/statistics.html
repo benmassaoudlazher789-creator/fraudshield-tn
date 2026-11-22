@@ -22,7 +22,16 @@
 }
 
 <!-- Indicateurs de la période -->
-<section class="kpis">
+<section class="kpis" [attr.aria-busy]="loading()">
+  @if (loading() && !stats()) {
+    @for (i of [0, 1, 2, 3]; track i) {
+      <div class="kpi" aria-hidden="true">
+        <span class="fs-skeleton" style="width: 60%"></span>
+        <span class="fs-skeleton fs-skeleton--value"></span>
+        <span class="fs-skeleton" style="width: 45%"></span>
+      </div>
+    }
+  } @else {
   <article class="kpi">
     <div class="kpi__head">
       <span class="kpi__label">Alertes interceptées</span>
@@ -74,6 +83,7 @@
     </div>
     <span class="kpi__foot">De l'alerte à la décision de l'analyste</span>
   </article>
+  }
 </section>
 
 <!-- Évolution des fraudes -->
@@ -88,7 +98,11 @@
     </span>
   </header>
   <div class="chart chart--line">
-    <p-chart type="line" [data]="lineData()" [options]="lineOptions" height="100%" />
+    @if (stats()) {
+      <p-chart type="line" [data]="lineData()" [options]="lineOptions()" height="100%" />
+    } @else if (loading()) {
+      <span class="fs-skeleton fs-skeleton--block" aria-hidden="true"></span>
+    }
   </div>
   <footer class="chart-legend">
     <span><span class="dot dot--primary"></span>Fraudes détectées (bloquées + à vérifier)</span>
@@ -124,6 +138,14 @@
             <span>Moyenne : {{ row.average === null ? '—' : (row.average | dt) }}</span>
           </div>
         </li>
+      } @empty {
+        @if (loading()) {
+          @for (i of [0, 1, 2]; track i) {
+            <li class="bar" aria-hidden="true"><span class="fs-skeleton" style="width: 50%"></span><span class="fs-skeleton"></span></li>
+          }
+        } @else {
+          <li><app-empty-state [compact]="true" icon="pi pi-check" title="Aucune fraude sur la période" /></li>
+        }
       }
     </ul>
     <div class="card__total">
@@ -158,7 +180,13 @@
           </div>
         </li>
       } @empty {
-        <li class="empty">Aucune transaction bloquée sur la période.</li>
+        @if (loading()) {
+          @for (i of [0, 1, 2]; track i) {
+            <li class="country" aria-hidden="true"><span class="fs-skeleton" style="width: 100%; height: 40px"></span></li>
+          }
+        } @else {
+          <li><app-empty-state [compact]="true" icon="pi pi-globe" title="Aucune transaction bloquée" message="Aucun pays de destination à signaler sur la période." /></li>
+        }
       }
     </ul>
   </section>
@@ -258,6 +286,8 @@
           </p>
         </div>
       </div>
+    } @else if (loading()) {
+      <span class="fs-skeleton fs-skeleton--block" aria-hidden="true"></span>
     }
   </section>
 
@@ -273,7 +303,7 @@
 
     <div class="decisions">
       <div class="donut">
-        <p-chart type="doughnut" [data]="donutData()" [options]="donutOptions" height="100%" />
+        <p-chart type="doughnut" [data]="donutData()" [options]="donutOptions()" height="100%" />
         <div class="donut__center">
           <strong class="tabular">{{ decisions().total ? decisions().confirmedRound + ' %' : '—' }}</strong>
           <small>Confirmé</small>

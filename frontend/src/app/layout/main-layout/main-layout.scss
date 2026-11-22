@@ -1,6 +1,5 @@
 :host {
   --sidebar-width: 260px;
-  --topbar-height: 64px;
   display: block;
 }
 
@@ -12,16 +11,16 @@
   width: var(--sidebar-width);
   display: flex;
   flex-direction: column;
-  background: var(--fs-primary-dark);
+  background: var(--fs-sidebar-bg);
   color: #fff;
 
   &__brand {
-    height: var(--topbar-height);
+    height: var(--fs-topbar-height);
     display: flex;
     align-items: center;
     gap: 0.75rem;
     padding: 0 1rem;
-    background: var(--fs-primary);
+    background: var(--fs-sidebar-brand);
   }
 
   &__logo {
@@ -30,13 +29,14 @@
     height: 32px;
     border-radius: 0.5rem;
     background: #fff;
-    color: var(--fs-primary-dark);
+    color: #00236f;
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
   &__brand-text {
+    flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -54,6 +54,22 @@
     font-weight: 600;
     letter-spacing: 0.05em;
     color: var(--fs-on-primary-soft);
+  }
+
+  /* Bouton fermer : uniquement quand la sidebar est hors écran */
+  &__close {
+    display: none;
+    padding: 0.5rem;
+    border: 0;
+    border-radius: 0.5rem;
+    background: none;
+    color: var(--fs-on-primary-muted);
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
   }
 
   &__nav {
@@ -92,19 +108,22 @@
   }
 
   &:hover {
-    background: var(--fs-primary);
+    background: rgba(255, 255, 255, 0.08);
     color: #fff;
   }
 
+  /* Anneau clair : visible sur le fond marine */
   &:focus-visible {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #b6c4ff;
     outline-offset: 2px;
   }
 
-  &--active {
-    background: var(--fs-primary);
+  &--active,
+  &--active:hover {
+    background: var(--fs-sidebar-active);
     color: #fff;
     font-weight: 600;
+    box-shadow: inset 3px 0 0 var(--fs-accent);
   }
 }
 
@@ -123,18 +142,18 @@
   flex-direction: column;
 }
 
+/* En-tête sticky opaque : le contenu défile dessous sans transparaître */
 .topbar {
   position: sticky;
   top: 0;
   z-index: 40;
-  height: var(--topbar-height);
+  height: var(--fs-topbar-height);
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   padding: 0 1.5rem;
-  background: rgba(247, 249, 251, 0.9);
-  backdrop-filter: blur(16px);
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.04);
+  background: var(--fs-topbar-bg);
+  border-bottom: 1px solid var(--fs-border);
 
   &__spacer {
     flex: 1;
@@ -146,18 +165,59 @@
     background: var(--fs-surface-high);
   }
 
-  &__burger {
+  /* .icon-button.topbar__burger : plus spécifique que .icon-button (display: inline-flex) */
+  .icon-button#{&}__burger {
     display: none;
-    padding: 0.5rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: none;
-    color: var(--fs-text);
-    cursor: pointer;
+  }
+}
 
-    &:hover {
-      background: var(--fs-surface-high);
-    }
+.icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--fs-text-muted);
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+
+  .pi {
+    font-size: 1.1rem;
+  }
+
+  &:hover {
+    background: var(--fs-surface-high);
+    color: var(--fs-text);
+  }
+}
+
+/* Indicateur WebSocket déconnecté / en reconnexion (apparaît après 1 s pour éviter un flash au chargement) */
+.ws-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  height: 30px;
+  padding: 0 0.75rem;
+  border-radius: 9999px;
+  background: var(--fs-warning-bg);
+  color: var(--fs-warning-text);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  animation: ws-in 0.2s ease-out 1s backwards;
+
+  &--down {
+    background: var(--fs-danger-bg);
+    color: var(--fs-danger-text);
+  }
+}
+
+@keyframes ws-in {
+  from {
+    opacity: 0;
   }
 }
 
@@ -198,24 +258,35 @@
   }
 }
 
+/* isolation : aucun z-index du contenu (overlays de tableau, en-têtes sticky…) ne passe au-dessus de l'en-tête */
 .content {
   flex: 1;
+  min-width: 0;
   padding: 2rem;
+  isolation: isolate;
 }
 
 .backdrop {
   display: none;
 }
 
-/* ---------- Mobile : sidebar hors écran ---------- */
-@media (max-width: 767px) {
+/* ---------- Sous 1024 px : sidebar hors écran + hamburger ---------- */
+@media (max-width: 1023px) {
   .sidebar {
     transform: translateX(-100%);
-    transition: transform 0.2s ease;
+    visibility: hidden;
+    transition: transform 0.22s ease, visibility 0s linear 0.22s;
+
+    &__close {
+      display: inline-flex;
+    }
   }
 
   .shell--menu-open .sidebar {
     transform: none;
+    visibility: visible;
+    transition: transform 0.22s ease;
+    box-shadow: 8px 0 32px rgba(0, 0, 0, 0.25);
   }
 
   .shell--menu-open .backdrop {
@@ -223,7 +294,7 @@
     position: fixed;
     inset: 0;
     z-index: 45;
-    background: rgba(15, 23, 42, 0.45);
+    background: var(--fs-overlay);
   }
 
   .main {
@@ -233,13 +304,44 @@
   .topbar {
     padding: 0 1rem;
 
-    &__burger {
+    .icon-button#{&}__burger {
       display: inline-flex;
     }
   }
 
+  .content {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .topbar {
+    gap: 0.25rem;
+  }
+
   .user__text,
   .topbar__divider {
+    display: none;
+  }
+
+  /* Libellé masqué visuellement mais toujours lu */
+  .ws-status {
+    width: 30px;
+    padding: 0;
+    justify-content: center;
+
+    &__text {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+    }
+  }
+
+  /* Déconnexion : icône seule (libellé conservé pour les lecteurs d'écran via ariaLabel) */
+  :host ::ng-deep .logout .p-button-label {
     display: none;
   }
 

@@ -23,11 +23,19 @@
     </div>
   }
 
-  @if (loading()) {
-    <p class="loading">Chargement des règles…</p>
-  }
-
-  <div class="rules">
+  <div class="rules" [attr.aria-busy]="loading()">
+    @if (loading()) {
+      @for (i of [0, 1, 2]; track i) {
+        <div class="rule rule--skeleton" aria-hidden="true">
+          <span class="fs-skeleton rule__icon"></span>
+          <div class="rule__body">
+            <span class="fs-skeleton fs-skeleton--title"></span>
+            <span class="fs-skeleton" style="width: 80%; margin-top: 0.625rem"></span>
+          </div>
+          <span class="fs-skeleton" style="width: 12rem; height: 2.25rem"></span>
+        </div>
+      }
+    }
     @for (row of rows(); track row.saved().id) {
       <form class="rule" [class.rule--off]="!row.saved().enabled" [formGroup]="row.form" (ngSubmit)="save(row)" novalidate>
         <span class="rule__icon" [class.rule__icon--danger]="row.view.danger" aria-hidden="true">
@@ -93,7 +101,7 @@
       </form>
     } @empty {
       @if (!loading() && !error()) {
-        <p class="loading">Aucune règle métier configurée.</p>
+        <app-empty-state class="fs-card" icon="pi pi-sliders-h" title="Aucune règle métier configurée" message="Les règles sont créées par les migrations de la base de données." />
       }
     }
   </div>
