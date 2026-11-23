@@ -45,6 +45,8 @@ import java.time.LocalDateTime;
 public class AnalystService {
 
     private static final int MAX_PAGE_SIZE = 100;
+    /** Nombre de transactions antérieures affichées dans l'historique du détail d'alerte. */
+    private static final int HISTORY_SIZE = 6;
 
     private final AlertRepository alertRepository;
     private final TransactionRepository transactionRepository;
@@ -92,7 +94,8 @@ public class AnalystService {
                 alert.getAnalystComment(),
                 analyst != null ? analyst.getFullName() : null,
                 alert.getDecidedAt(),
-                transactionRepository.findTop6ByAccountIdAndIdNotOrderByCreatedAtDesc(account.getId(), tx.getId())
+                transactionRepository.findPreviousByAccount(account.getId(), tx.getCreatedAt(), tx.getId(),
+                                PageRequest.of(0, HISTORY_SIZE))
                         .stream().map(AnalystService::toInfo).toList());
     }
 

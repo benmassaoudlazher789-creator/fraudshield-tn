@@ -27,8 +27,19 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
     /** Règle VELOCITY_10_MIN : nombre de transactions du compte dans une fenêtre de temps. */
     long countByAccountIdAndCreatedAtBetween(Long accountId, LocalDateTime from, LocalDateTime to);
 
-    /** Historique affiché dans le détail d'une alerte (sans la transaction elle-même). */
-    List<Transaction> findTop6ByAccountIdAndIdNotOrderByCreatedAtDesc(Long accountId, Long excludedId);
+    /**
+     * Historique affiché dans le détail d'une alerte : transactions du compte créées avant la
+     * transaction de référence, de la plus récente à la plus ancienne. À date égale, l'id départage
+     * (seules celles d'id inférieur sont considérées antérieures) ; la référence elle-même est exclue.
+     */
+    @Query("""
+            select t from Transaction t
+            where t.account.id = :accountId
+              and (t.createdAt < :createdAt or (t.createdAt = :createdAt and t.id < :txId))
+            order by t.createdAt desc, t.id desc""")
+    List<Transaction> findPreviousByAccount(@Param("accountId") Long accountId,
+                                            @Param("createdAt") LocalDateTime createdAt,
+                                            @Param("txId") Long txId, Pageable pageable);
 
     /** Tableau de bord : nombre de transactions depuis une date. */
     long countByCreatedAtGreaterThanEqual(LocalDateTime from);
