@@ -19,6 +19,7 @@ une banque tunisienne fictive. Chaque paiement saisi par un client suit ce parco
 
 <table>
   <tr>
+    <td><img src="docs/screenshots/connexion.png" alt="Page de connexion" /></td>
     <td><img src="docs/screenshots/paiement.png" alt="Espace client : paiement" /></td>
     <td><img src="docs/screenshots/detail-alerte.png" alt="Détail d'une alerte avec explications SHAP" /></td>
   </tr>

@@ -24,6 +24,7 @@ const TYPE_VIEW: Record<TransactionType, { label: string; icon: string }> = {
 
 const integer = new Intl.NumberFormat('fr-FR');
 const percent = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const percentInt = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 0 });
 const ratio = new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const dayFormat = new Intl.DateTimeFormat('fr-FR', { day: '2-digit', month: 'short' });
 
@@ -88,11 +89,15 @@ export class Statistics {
 
   protected readonly alertsDelta = computed(() => {
     const s = this.stats()?.summary;
-    if (!s || s.previousAlerts === 0) {
+    if (!s) {
       return null;
     }
+    // Base de comparaison trop faible : un pourcentage serait trompeur.
+    if (s.previousAlerts < 10) {
+      return { up: true, isNew: true, text: 'Nouvelle activité' };
+    }
     const delta = ((s.alerts - s.previousAlerts) / s.previousAlerts) * 100;
-    return { up: delta > 0, text: `${percent.format(Math.abs(delta))} %` };
+    return { up: delta > 0, isNew: false, text: `${percentInt.format(Math.abs(delta))} %` };
   });
 
   protected readonly decisions = computed(() => {

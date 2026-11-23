@@ -41,7 +41,9 @@
       {{ alertsText() }}
       @if (alertsDelta(); as delta) {
         <span class="kpi__delta" [class.kpi__delta--up]="delta.up">
-          <i [class]="delta.up ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" aria-hidden="true"></i>{{ delta.text }}
+          @if (!delta.isNew) {
+            <i [class]="delta.up ? 'pi pi-arrow-up' : 'pi pi-arrow-down'" aria-hidden="true"></i>
+          }{{ delta.text }}
         </span>
       }
     </div>
